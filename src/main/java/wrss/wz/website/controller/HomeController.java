@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import wrss.wz.website.entity.Student;
+import wrss.wz.website.repository.Student;
 import wrss.wz.website.model.request.StudentRequest;
 import wrss.wz.website.repository.TestRepository;
 
