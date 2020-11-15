@@ -38,8 +38,10 @@ public class UserEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<TripEntity> trips;
 
-    public UserEntity(@NotNull Long id, @NotNull String name, @NotNull String username, @NotNull String encryptedPassword) {
+    public UserEntity(@NotNull Long id, @NotNull String userId, @NotNull String name,
+                      @NotNull String username, @NotNull String encryptedPassword) {
         this.id = id;
+        this.userId = userId;
         this.name = name;
         this.username = username;
         this.encryptedPassword = encryptedPassword;
