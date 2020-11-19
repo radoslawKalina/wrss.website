@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import wrss.wz.website.dto.UserDto;
-import wrss.wz.website.entity.UserEntity;
+import wrss.wz.website.entity.StudentEntity;
 import wrss.wz.website.repository.UserRepository;
 
 import javax.transaction.Transactional;
@@ -32,11 +32,11 @@ public class UserServiceImpl implements UserService {
         //TODO: Add checking for users already existing in database
         //TODO: Add user roles
 
-        UserEntity userEntity = modelMapper.map(userDto, UserEntity.class);
-        userEntity.setEncryptedPassword(bCryptPasswordEncoder.encode(userDto.getPassword()));
-        userEntity.setUserId(UUID.randomUUID().toString());
+        StudentEntity studentEntity = modelMapper.map(userDto, StudentEntity.class);
+        studentEntity.setEncryptedPassword(bCryptPasswordEncoder.encode(userDto.getPassword()));
+        studentEntity.setUserId(UUID.randomUUID().toString());
 
-        UserEntity savedUser = userRepository.save(userEntity);
+        StudentEntity savedUser = userRepository.save(studentEntity);
 
         return modelMapper.map(savedUser, UserDto.class);
     }

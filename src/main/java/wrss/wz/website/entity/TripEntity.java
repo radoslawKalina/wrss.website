@@ -50,7 +50,7 @@ public class TripEntity {
     @ManyToOne(fetch = FetchType.LAZY,
             cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
     @JoinColumn(name = "user_id")
-    private UserEntity user;
+    private StudentEntity user;
 
     public TripEntity(@NotNull Long id, @NotNull String name, @NotNull String surname, @NotNull @Email String email,
                       @NotNull Integer index, @NotNull String shirtSize, @NotNull String transport, String university, String faculty) {

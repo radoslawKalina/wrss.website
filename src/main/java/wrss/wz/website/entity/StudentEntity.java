@@ -8,15 +8,13 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Entity
 @Data
 @NoArgsConstructor
-@Table(name="user")
-public class UserEntity {
+public class StudentEntity {
 
     @Id
     @NotNull
@@ -38,8 +36,8 @@ public class UserEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<TripEntity> trips;
 
-    public UserEntity(@NotNull Long id, @NotNull String userId, @NotNull String name,
-                      @NotNull String username, @NotNull String encryptedPassword) {
+    public StudentEntity(@NotNull Long id, @NotNull String userId, @NotNull String name,
+                         @NotNull String username, @NotNull String encryptedPassword) {
         this.id = id;
         this.userId = userId;
         this.name = name;
