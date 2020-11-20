@@ -6,4 +6,5 @@ import wrss.wz.website.entity.StudentEntity;
 
 @Repository
 public interface UserRepository extends JpaRepository<StudentEntity, Long> {
+    StudentEntity findByUsername(String username);
 }
