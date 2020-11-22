@@ -67,6 +67,11 @@
 			<artifactId>json</artifactId>
 			<version>20180130</version>
 		</dependency>
+		<dependency>
+			<groupId>org.asciidoctor</groupId>
+			<artifactId>asciidoctor-maven-plugin</artifactId>
+			<version>2.1.0</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -85,27 +90,22 @@
 			<plugin>
 				<groupId>org.asciidoctor</groupId>
 				<artifactId>asciidoctor-maven-plugin</artifactId>
-				<version>1.5.8</version>
+				<version>1.6.0</version>
 				<executions>
 					<execution>
-						<id>generate-docs</id>
-						<phase>prepare-package</phase>
+						<id>output-html</id>
+						<phase>generate-resources</phase>
 						<goals>
 							<goal>process-asciidoc</goal>
 						</goals>
 						<configuration>
 							<backend>html</backend>
 							<doctype>book</doctype>
+							<sourceDirectory>src/docs</sourceDirectory>
+							<outputDirectory>${project.build.directory}/classes/static</outputDirectory>
 						</configuration>
 					</execution>
 				</executions>
-				<dependencies>
-					<dependency>
-						<groupId>org.springframework.restdocs</groupId>
-						<artifactId>spring-restdocs-asciidoctor</artifactId>
-						<version>${spring-restdocs.version}</version>
-					</dependency>
-				</dependencies>
 			</plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
@@ -113,5 +113,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>

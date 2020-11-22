@@ -1,0 +1,3 @@
+= WRSS WZ Website
+
+This API allows to sign up for events organized by faculty student council.

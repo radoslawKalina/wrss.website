@@ -15,6 +15,6 @@ public class HomeController {
         JSONObject json = new JSONObject().put("application", "WRSS WZ Website")
                                           .put("documentation", "/api.html");
 
-        return new ResponseEntity<>(json, HttpStatus.OK);
+        return new ResponseEntity<>(json.toString(), HttpStatus.OK);
     }
 }
