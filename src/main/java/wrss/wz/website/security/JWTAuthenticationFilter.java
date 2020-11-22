@@ -21,7 +21,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static wrss.wz.website.security.SecurityConstants.HEADER_STRING;
+import static wrss.wz.website.security.SecurityConstants.EXPIRATION_TIME;
+import static wrss.wz.website.security.SecurityConstants.HEADER;
 import static wrss.wz.website.security.SecurityConstants.SECRET;
 import static wrss.wz.website.security.SecurityConstants.TOKEN_PREFIX;
 
@@ -39,6 +40,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                     user.getUsername(), user.getPassword(), new ArrayList<>()));
 
         } catch (IOException e) {
+            //TODO: Create custom exception
             throw new RuntimeException(e);
         }
     }
@@ -46,19 +48,20 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, FilterChain chain, Authentication auth) {
         UserDetailsImpl user = ((UserDetailsImpl) auth.getPrincipal());
+
         List<String> authorities = user.getAuthorities()
                                        .stream()
                                        .map(GrantedAuthority::getAuthority)
                                        .collect(Collectors.toList());
 
         String token = Jwts.builder()
-                .setSubject(user.getPassword())
-                .claim("authorities", authorities)
-                .setExpiration(new Date(System.currentTimeMillis() + SecurityConstants.EXPIRATION_TIME))
-                .signWith(SignatureAlgorithm.HS512, SECRET)
-                .compact();
+                           .setSubject(user.getPassword())
+                           .claim("authorities", authorities)
+                           .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                           .signWith(SignatureAlgorithm.HS512, SECRET)
+                           .compact();
 
-        res.addHeader(HEADER_STRING, TOKEN_PREFIX + token);
+        res.addHeader(HEADER, TOKEN_PREFIX + token);
     }
 }
 

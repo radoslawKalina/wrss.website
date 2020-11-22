@@ -16,29 +16,35 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import static wrss.wz.website.security.SecurityConstants.HEADER_STRING;
+import static java.util.stream.Collectors.toList;
+import static wrss.wz.website.security.SecurityConstants.HEADER;
 import static wrss.wz.website.security.SecurityConstants.SECRET;
 import static wrss.wz.website.security.SecurityConstants.TOKEN_PREFIX;
 
 public class JWTAuthorizationFilter extends OncePerRequestFilter {
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-                                    FilterChain chain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+            throws ServletException, IOException {
+
         try {
             if (checkJWTToken(request)) {
                 Claims claims = validateToken(request);
+
                 if (claims.get("authorities") != null) {
                     setUpSpringAuthentication(claims);
+
                 } else {
                     SecurityContextHolder.clearContext();
                 }
-            }else {
+
+            } else {
                 SecurityContextHolder.clearContext();
             }
+
             chain.doFilter(request, response);
+
         } catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException e) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             response.sendError(HttpServletResponse.SC_FORBIDDEN, e.getMessage());
@@ -46,22 +52,25 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
     }
 
     private Claims validateToken(HttpServletRequest request) {
-        String jwtToken = request.getHeader(HEADER_STRING).replace(TOKEN_PREFIX, "");
-        return Jwts.parser().setSigningKey(SECRET).parseClaimsJws(jwtToken).getBody();
+        String token = request.getHeader(HEADER);
+        return Jwts.parser()
+                   .setSigningKey(SECRET)
+                   .parseClaimsJws(token.replace(TOKEN_PREFIX, ""))
+                   .getBody();
     }
 
-    @SuppressWarnings("unchecked")
     private void setUpSpringAuthentication(Claims claims) {
-        List<String> authorities = (List) claims.get("authorities");
+        List<String> authorities = (List<String>) claims.get("authorities");
+        List<SimpleGrantedAuthority> roles = authorities.stream()
+                                                        .map(SimpleGrantedAuthority::new)
+                                                        .collect(toList());
 
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(claims.getSubject(), null,
-                authorities.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()));
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(claims.getSubject(), null, roles);
         SecurityContextHolder.getContext().setAuthentication(auth);
-
     }
 
     private boolean checkJWTToken(HttpServletRequest request) {
-        String authenticationHeader = request.getHeader(HEADER_STRING);
+        String authenticationHeader = request.getHeader(HEADER);
         return authenticationHeader != null && authenticationHeader.startsWith(TOKEN_PREFIX);
     }
 }
