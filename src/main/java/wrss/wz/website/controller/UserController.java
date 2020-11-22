@@ -1,7 +1,7 @@
 package wrss.wz.website.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,22 +15,15 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/user")
+@RequiredArgsConstructor
 public class UserController {
 
     private static final ModelMapper modelMapper = new ModelMapper();
-
-    private UserService userService;
-
-    @Autowired
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
+    private final UserService userService;
 
     @PostMapping
     public UserResponse createUser(@Valid @RequestBody UserRequest userRequest) {
-
         UserDto requestUser = modelMapper.map(userRequest, UserDto.class);
-
         UserDto createdUser = userService.createUser(requestUser);
 
         return modelMapper.map(createdUser, UserResponse.class);

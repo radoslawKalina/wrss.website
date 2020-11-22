@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/admin/trip")
 public class AdminTripController {
 
-    @GetMapping("/")
+    @GetMapping()
     public ResponseEntity<?> home() {
         return new ResponseEntity<>("Hello in admin panel for trip", HttpStatus.OK);
     }

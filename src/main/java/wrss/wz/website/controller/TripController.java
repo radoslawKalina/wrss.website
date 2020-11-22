@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/trip")
 public class TripController {
 
-    @GetMapping("/")
+    @GetMapping()
     public ResponseEntity<?> home() {
         return new ResponseEntity<>("Sign up for the trip", HttpStatus.OK);
     }
