@@ -1,5 +1,6 @@
 package wrss.wz.website.controller;
 
+import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,6 +11,10 @@ public class HomeController {
 
     @GetMapping()
     public ResponseEntity<?> home() {
-        return new ResponseEntity<>("WRSS WZ Website", HttpStatus.OK);
+
+        JSONObject json = new JSONObject().put("application", "WRSS WZ Website")
+                                          .put("documentation", "/api.html");
+
+        return new ResponseEntity<>(json, HttpStatus.OK);
     }
 }
