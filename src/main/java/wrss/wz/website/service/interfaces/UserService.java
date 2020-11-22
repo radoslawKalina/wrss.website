@@ -1,4 +1,4 @@
-package wrss.wz.website.service;
+package wrss.wz.website.service.interfaces;
 
 import wrss.wz.website.dto.UserDto;
 

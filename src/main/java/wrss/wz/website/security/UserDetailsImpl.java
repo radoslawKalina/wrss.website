@@ -4,12 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import wrss.wz.website.entity.RoleEntity;
 import wrss.wz.website.entity.StudentEntity;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 @RequiredArgsConstructor
 public class UserDetailsImpl implements UserDetails {
@@ -18,14 +17,11 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        List<RoleEntity> roles = userEntity.getRoles();
-        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
 
-        for (RoleEntity role : roles) {
-            authorities.add(new SimpleGrantedAuthority(role.getRole()));
-        }
-
-        return authorities;
+        return userEntity.getRoles()
+                         .stream()
+                         .map(role -> new SimpleGrantedAuthority(role.getRole()))
+                         .collect(toList());
     }
 
     @Override

@@ -12,6 +12,7 @@ import wrss.wz.website.entity.StudentEntity;
 import wrss.wz.website.repository.RoleRepository;
 import wrss.wz.website.repository.UserRepository;
 import wrss.wz.website.security.UserDetailsImpl;
+import wrss.wz.website.service.interfaces.UserService;
 
 import javax.transaction.Transactional;
 import java.util.UUID;
