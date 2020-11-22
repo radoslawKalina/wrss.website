@@ -15,13 +15,11 @@ public class UserRequest {
     @NotBlank
     private String name;
 
-    @NotBlank
     @Email
+    @NotBlank
     private String username;
 
     @NotBlank
     private String password;
 
-    @NotBlank
-    private String confirmPassword;
 }

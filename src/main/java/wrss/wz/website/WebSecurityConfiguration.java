@@ -28,14 +28,13 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
+            .addFilter(new JWTAuthenticationFilter(authenticationManager()))
             .addFilterAfter(new JWTAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class)
             .authorizeRequests()
             .antMatchers("/api/trip/**").hasAuthority("STUDENT")
             .antMatchers("/api/admin/trip/**").hasAuthority("ADMIN")
             .antMatchers("/").permitAll()
             .antMatchers(HttpMethod.POST, "/api/user").permitAll()
-            .anyRequest().authenticated()
-            .and()
-            .addFilter(new JWTAuthenticationFilter(authenticationManager()));
+            .anyRequest().authenticated();
     }
 }

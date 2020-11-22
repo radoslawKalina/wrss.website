@@ -36,7 +36,6 @@ public class UserServiceImpl implements UserDetailsService, UserService {
         }
 
         StudentEntity studentEntity = modelMapper.map(userDto, StudentEntity.class);
-
         studentEntity.setPassword(bCryptPasswordEncoder.encode(userDto.getPassword()));
         studentEntity.setUserId(UUID.randomUUID().toString());
         studentEntity.addRole(roleRepository.findByRole("STUDENT"));
