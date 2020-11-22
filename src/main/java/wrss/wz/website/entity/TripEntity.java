@@ -2,6 +2,7 @@ package wrss.wz.website.entity;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import javax.validation.constraints.NotBlank;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -18,30 +19,29 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 public class TripEntity {
 
-    //TODO: Add custom validation for index
-
     @Id
     @NotNull
     @GeneratedValue
     private Long id;
 
-    @NotNull
+    @NotBlank
     private String name;
 
-    @NotNull
+    @NotBlank
     private String surname;
 
-    @NotNull
     @Email
+    @NotBlank
     private String email;
 
-    @NotNull
+    //TODO: Add custom validation for index
+    @NotBlank
     private Integer index;
 
-    @NotNull
+    @NotBlank
     private String shirtSize;
 
-    @NotNull
+    @NotBlank
     private String transport;
 
     private String university;
@@ -52,16 +52,4 @@ public class TripEntity {
     @JoinColumn(name = "user_id")
     private StudentEntity user;
 
-    public TripEntity(@NotNull Long id, @NotNull String name, @NotNull String surname, @NotNull @Email String email,
-                      @NotNull Integer index, @NotNull String shirtSize, @NotNull String transport, String university, String faculty) {
-        this.id = id;
-        this.name = name;
-        this.surname = surname;
-        this.email = email;
-        this.index = index;
-        this.shirtSize = shirtSize;
-        this.transport = transport;
-        this.university = university;
-        this.faculty = faculty;
-    }
 }
