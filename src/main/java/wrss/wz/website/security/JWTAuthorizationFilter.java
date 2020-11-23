@@ -65,7 +65,7 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
                                                         .map(SimpleGrantedAuthority::new)
                                                         .collect(toList());
 
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(claims.getSubject(), null, roles);
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(claims.get("username"), null, roles);
         SecurityContextHolder.getContext().setAuthentication(auth);
     }
 

@@ -50,6 +50,9 @@ public class StudentEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<TripEntity> trips;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<PromEnrollmentEntity> prom;
+
     public void addRole(RoleEntity userRole) {
         if (roles == null) {
             roles = new ArrayList<>();
