@@ -9,11 +9,11 @@ import javax.validation.constraints.NotBlank;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PromSignUpPersonRequest {
+public class PromEnrollmentPersonRequest {
 
-    @NotBlank
+    @NotBlank(message = "Name field can't be blank")
     private String name;
 
-    @NotBlank
+    @NotBlank(message = "Surname field can't be blank")
     private String surname;
 }
