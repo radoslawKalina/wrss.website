@@ -7,8 +7,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import wrss.wz.website.dto.UserDto;
 import wrss.wz.website.entity.StudentEntity;
+import wrss.wz.website.model.request.UserRequest;
+import wrss.wz.website.model.response.UserResponse;
 import wrss.wz.website.repository.RoleRepository;
 import wrss.wz.website.repository.UserRepository;
 import wrss.wz.website.security.UserDetailsImpl;
@@ -29,21 +30,21 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 
     @Override
     @Transactional
-    public UserDto createUser(UserDto userDto) {
+    public UserResponse createUser(UserRequest userRequest) {
 
         //TODO: Create custom exception
-        if (userRepository.findByUsername(userDto.getUsername()) != null) {
+        if (userRepository.findByUsername(userRequest.getUsername()) != null) {
             throw new RuntimeException();
         }
 
-        StudentEntity studentEntity = modelMapper.map(userDto, StudentEntity.class);
-        studentEntity.setPassword(bCryptPasswordEncoder.encode(userDto.getPassword()));
+        StudentEntity studentEntity = modelMapper.map(userRequest, StudentEntity.class);
+        studentEntity.setPassword(bCryptPasswordEncoder.encode(userRequest.getPassword()));
         studentEntity.setUserId(UUID.randomUUID().toString());
         studentEntity.addRole(roleRepository.findByRole("STUDENT"));
 
         StudentEntity savedUser = userRepository.save(studentEntity);
 
-        return modelMapper.map(savedUser, UserDto.class);
+        return modelMapper.map(savedUser, UserResponse.class);
     }
 
     @Override
