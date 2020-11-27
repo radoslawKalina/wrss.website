@@ -74,6 +74,11 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.codehaus.groovy</groupId>
+			<artifactId>groovy</artifactId>
+			<version>3.0.3</version>
+		</dependency>
+		<dependency>
 			<groupId>org.spockframework</groupId>
 			<artifactId>spock-core</artifactId>
 			<version>1.2-groovy-2.4</version>
@@ -110,6 +115,16 @@
 						</goals>
 					</execution>
 				</executions>
+				<configuration>
+					<testSources>
+						<testSource>
+							<directory>${project.basedir}/src/test/groovy</directory>
+							<includes>
+								<include>**/*.groovy</include>
+							</includes>
+						</testSource>
+					</testSources>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.asciidoctor</groupId>
