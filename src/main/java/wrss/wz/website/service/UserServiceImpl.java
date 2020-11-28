@@ -23,8 +23,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserDetailsService, UserService {
 
-    private static final ModelMapper modelMapper = new ModelMapper();
-
+    private final ModelMapper modelMapper;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;

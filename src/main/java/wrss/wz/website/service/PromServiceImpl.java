@@ -21,8 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PromServiceImpl implements PromService {
 
-    private final ModelMapper modelMapper = new ModelMapper();
-
+    private final ModelMapper modelMapper;
     private final UserRepository userRepository;
     private final PromEnrollmentRepository promEnrollmentRepository;
 

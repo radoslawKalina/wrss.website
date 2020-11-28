@@ -7,6 +7,7 @@ import spock.lang.Specification;
 import spock.lang.Subject
 import spock.lang.Unroll
 import wrss.wz.website.exception.RestExceptionHandler
+import wrss.wz.website.exception.custom.UserAlreadyExistException
 import wrss.wz.website.model.request.UserRequest
 import wrss.wz.website.model.response.UserResponse
 import wrss.wz.website.service.UserServiceImpl;
@@ -68,6 +69,29 @@ class UserControllerTest extends Specification {
             NAME | USERNAME | PASSWORD
     }
 
+    def "should return 400 and custom exception when user already exist in database"() {
+        given:
+            Map request = [
+                    name: name,
+                    username: username,
+                    password: password
+            ]
+        when:
+            def response = mockMvc.perform(post(URL)
+                                  .content(JsonOutput.toJson(request))
+                                  .contentType(APPLICATION_JSON))
+        then:
+            1 * userService.createUser(new UserRequest(NAME, USERNAME, PASSWORD)) >>
+                    {throw new UserAlreadyExistException("username: User with this email already exist")}
+        then:
+            response.andExpect(status().isBadRequest())
+            response.andExpect(jsonPath('$.errorType').value(ERROR_TYPE))
+            response.andExpect(jsonPath('$.errorMessage[0]').value(errorMessage))
+        where:
+            name | username  | password | errorMessage
+            NAME | USERNAME  | PASSWORD | "username: User with this email already exist"
+    }
+
     @Unroll
     def "should return 400 and custom exception when request is not valid"() {
         given:
@@ -78,8 +102,8 @@ class UserControllerTest extends Specification {
             ]
         when:
             def response = mockMvc.perform(post(URL)
-                    .content(JsonOutput.toJson(request))
-                    .contentType(APPLICATION_JSON))
+                                  .content(JsonOutput.toJson(request))
+                                  .contentType(APPLICATION_JSON))
         then:
             response.andExpect(status().isBadRequest())
             response.andExpect(jsonPath('$.errorType').value(ERROR_TYPE))

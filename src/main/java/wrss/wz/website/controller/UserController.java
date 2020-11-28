@@ -17,7 +17,6 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 public class UserController {
 
-    private static final ModelMapper modelMapper = new ModelMapper();
     private final UserService userService;
 
     @PostMapping
