@@ -6,8 +6,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import wrss.wz.website.exception.custom.UserAlreadyExistException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +30,15 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         exception.getBindingResult().getFieldErrors().forEach(error ->
                 messageList.add(String.format("%s: %s", error.getField(), error.getDefaultMessage())));
 
-        ErrorResponseList errorResponse = new ErrorResponseList(InvalidRequestArgumentValue, messageList);
+        ErrorResponse errorResponse = new ErrorResponse(InvalidRequestArgumentValue, messageList);
+        return new ResponseEntity<>(errorResponse, BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UserAlreadyExistException.class)
+    @ResponseStatus(BAD_REQUEST)
+    @ResponseBody
+    public ResponseEntity<ErrorResponse> handleUserAlreadyExistException(UserAlreadyExistException exception) {
+        ErrorResponse errorResponse = new ErrorResponse(InvalidRequestArgumentValue, List.of(exception.getMessage()));
         return new ResponseEntity<>(errorResponse, BAD_REQUEST);
     }
 }

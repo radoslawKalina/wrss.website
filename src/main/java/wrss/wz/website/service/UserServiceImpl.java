@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import wrss.wz.website.entity.StudentEntity;
+import wrss.wz.website.exception.custom.UserAlreadyExistException;
 import wrss.wz.website.model.request.UserRequest;
 import wrss.wz.website.model.response.UserResponse;
 import wrss.wz.website.repository.RoleRepository;
@@ -32,9 +33,8 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     @Transactional
     public UserResponse createUser(UserRequest userRequest) {
 
-        //TODO: Create custom exception
         if (userRepository.findByUsername(userRequest.getUsername()) != null) {
-            throw new RuntimeException();
+            throw new UserAlreadyExistException("username: User with this email already exist");
         }
 
         StudentEntity studentEntity = modelMapper.map(userRequest, StudentEntity.class);
