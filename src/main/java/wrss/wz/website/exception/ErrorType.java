@@ -1,5 +1,6 @@
 package wrss.wz.website.exception;
 
 public enum ErrorType {
-    InvalidRequestArgumentValue;
+    InvalidRequestArgumentValue,
+    OperationNotAllowedForUser;
 }

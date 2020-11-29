@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PromGetEnrollmentResponse {
 
-    private Long id;
+    private String promEnrollmentCustomId;
     private PromGetEnrollmentPersonResponse mainPerson;
     private PromGetEnrollmentPersonResponse partner;
     private String message;

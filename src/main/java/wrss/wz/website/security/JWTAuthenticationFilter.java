@@ -40,7 +40,6 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                     user.getUsername(), user.getPassword(), new ArrayList<>()));
 
         } catch (IOException e) {
-            //TODO: Create custom exception
             throw new RuntimeException(e);
         }
     }

@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PromSignUpResponse {
+public class PromEnrollmentResponse {
     private Long id;
 }

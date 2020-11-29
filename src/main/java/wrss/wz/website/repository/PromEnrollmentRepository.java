@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface PromEnrollmentRepository extends JpaRepository<PromEnrollmentEntity, Long> {
     List<PromEnrollmentEntity> findAllByUser(StudentEntity user);
+    PromEnrollmentEntity findByPromEnrollmentCustomId(String enrollmentId);
 }
