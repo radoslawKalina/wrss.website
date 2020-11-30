@@ -22,14 +22,16 @@ public class PromEnrollmentPersonRequest {
 
     @Email(message = "Wrong value for email field. You need to provide email address")
     @NotBlank(message = "Email field can't be blank")
-    private String mail;
+    private String email;
 
     @NotNull(message = "Phone number field can't be blank")
     @Size(min = 9, max = 9, message = "Wrong value for phone number field. You need to provide valid phone number")
     private String phoneNumber;
 
-    private Integer index;
+    @NotNull(message = "fromAGH field can't be null")
     private boolean fromAGH;
+
+    private Integer index;
     private String faculty;
     private String field;
     private Integer year;

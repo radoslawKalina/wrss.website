@@ -36,13 +36,15 @@ public class PromPersonEntity {
     private String surname;
 
     @NotBlank
-    private String mail;
+    private String email;
 
     @NotBlank
     private String phoneNumber;
 
-    private Integer index;
+    @NotNull
     private boolean fromAGH;
+
+    private Integer index;
     private String faculty;
     private String field;
     private Integer year;

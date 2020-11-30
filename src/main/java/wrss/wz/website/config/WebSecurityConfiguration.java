@@ -1,4 +1,4 @@
-package wrss.wz.website;
+package wrss.wz.website.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpMethod;

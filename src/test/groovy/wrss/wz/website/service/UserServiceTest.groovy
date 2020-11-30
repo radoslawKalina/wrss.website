@@ -39,7 +39,7 @@ class UserServiceTest extends Specification {
         userServiceImpl = new UserServiceImpl(modelMapper, userRepository, roleRepository, bCryptPasswordEncoder)
     }
 
-    def "should return UserResponse"() {
+    def "should create user and return UserResponse"() {
         given:
             StudentEntity studentEntity = new StudentEntity()
             studentEntity.setName(NAME)
@@ -53,7 +53,7 @@ class UserServiceTest extends Specification {
             1 * userRepository.save(_ as StudentEntity) >> studentEntity
         then:
             userResponse.getUsername() == USERNAME
-            userResponse.getUserId() == USER_ID.toString()
+            userResponse.getUserId() == USER_ID
     }
 
     def "should throw UserAlreadyExistException when provided email already exist in database"() {

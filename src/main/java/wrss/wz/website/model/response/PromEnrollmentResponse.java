@@ -10,5 +10,10 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PromEnrollmentResponse {
+
     private UUID promEnrollmentId;
+    private PromEnrollmentPersonResponse mainPerson;
+    private PromEnrollmentPersonResponse partner;
+    private boolean paid;
+    private String message;
 }

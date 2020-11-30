@@ -1,4 +1,4 @@
-package wrss.wz.website;
+package wrss.wz.website.config;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;

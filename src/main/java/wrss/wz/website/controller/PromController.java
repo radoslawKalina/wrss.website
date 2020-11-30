@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import wrss.wz.website.model.request.PromEnrollmentPersonRequest;
 import wrss.wz.website.model.request.PromEnrollmentRequest;
-import wrss.wz.website.model.response.PromGetEnrollmentResponse;
+import wrss.wz.website.model.response.PromEnrollmentPersonResponse;
 import wrss.wz.website.model.response.PromEnrollmentResponse;
 import wrss.wz.website.service.interfaces.PromService;
 
@@ -28,14 +28,14 @@ public class PromController {
     public final PromService promService;
 
     @GetMapping
-    public List<PromGetEnrollmentResponse> getAll(Authentication authentication) {
+    public List<PromEnrollmentResponse> getAll(Authentication authentication) {
 
         String username = authentication.getPrincipal().toString();
         return promService.getAll(username);
     }
 
     @GetMapping("/{enrollmentId}")
-    public PromGetEnrollmentResponse get(@PathVariable UUID enrollmentId, Authentication authentication) {
+    public PromEnrollmentResponse get(@PathVariable UUID enrollmentId, Authentication authentication) {
 
         String username = authentication.getPrincipal().toString();
         return promService.get(enrollmentId, username);
@@ -49,10 +49,10 @@ public class PromController {
     }
 
     @PutMapping("/{enrollmentId}")
-    public void update(@Valid @RequestBody PromEnrollmentPersonRequest promEnrollmentPersonRequest,
-                       @PathVariable UUID enrollmentId, @RequestParam String person, Authentication authentication) {
+    public PromEnrollmentPersonResponse update(@Valid @RequestBody PromEnrollmentPersonRequest promEnrollmentPersonRequest,
+                                               @PathVariable UUID enrollmentId, @RequestParam String person, Authentication authentication) {
 
         String username = authentication.getPrincipal().toString();
-        promService.update(promEnrollmentPersonRequest, enrollmentId, person, username);
+        return promService.update(promEnrollmentPersonRequest, enrollmentId, person, username);
     }
 }

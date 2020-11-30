@@ -46,6 +46,7 @@ public class PromEnrollmentEntity {
     @JoinColumn(name = "user_id")
     private StudentEntity user;
 
+    @NotNull
     private boolean paid;
 
     private String message;
