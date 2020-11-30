@@ -6,9 +6,10 @@ import wrss.wz.website.entity.PromEnrollmentEntity;
 import wrss.wz.website.entity.StudentEntity;
 
 import java.util.List;
+import java.util.UUID;
 
 @Repository
 public interface PromEnrollmentRepository extends JpaRepository<PromEnrollmentEntity, Long> {
     List<PromEnrollmentEntity> findAllByUser(StudentEntity user);
-    PromEnrollmentEntity findByPromEnrollmentCustomId(String enrollmentId);
+    PromEnrollmentEntity findByPromEnrollmentId(UUID enrollmentId);
 }

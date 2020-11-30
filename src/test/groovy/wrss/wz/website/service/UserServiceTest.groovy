@@ -18,7 +18,7 @@ class UserServiceTest extends Specification {
     String NAME = "TestUser"
     String USERNAME = "user@gmail.com"
     String PASSWORD = "password"
-    String USER_ID = UUID.randomUUID().toString()
+    UUID USER_ID = UUID.randomUUID()
 
     UserRequest userRequest = new UserRequest(NAME, USERNAME, PASSWORD)
 
@@ -53,7 +53,7 @@ class UserServiceTest extends Specification {
             1 * userRepository.save(_ as StudentEntity) >> studentEntity
         then:
             userResponse.getUsername() == USERNAME
-            userResponse.getUserId() == USER_ID
+            userResponse.getUserId() == USER_ID.toString()
     }
 
     def "should throw UserAlreadyExistException when provided email already exist in database"() {

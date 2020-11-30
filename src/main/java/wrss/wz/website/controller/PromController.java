@@ -18,6 +18,7 @@ import wrss.wz.website.service.interfaces.PromService;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("api/student/prom")
@@ -34,7 +35,7 @@ public class PromController {
     }
 
     @GetMapping("/{enrollmentId}")
-    public PromGetEnrollmentResponse get(@PathVariable String enrollmentId, Authentication authentication) {
+    public PromGetEnrollmentResponse get(@PathVariable UUID enrollmentId, Authentication authentication) {
 
         String username = authentication.getPrincipal().toString();
         return promService.get(enrollmentId, username);
@@ -49,7 +50,7 @@ public class PromController {
 
     @PutMapping("/{enrollmentId}")
     public void update(@Valid @RequestBody PromEnrollmentPersonRequest promEnrollmentPersonRequest,
-                                         @PathVariable String enrollmentId, @RequestParam String person, Authentication authentication) {
+                       @PathVariable UUID enrollmentId, @RequestParam String person, Authentication authentication) {
 
         String username = authentication.getPrincipal().toString();
         promService.update(promEnrollmentPersonRequest, enrollmentId, person, username);

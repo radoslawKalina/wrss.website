@@ -10,12 +10,13 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -27,11 +28,8 @@ public class PromEnrollmentEntity {
 
     @Id
     @NotNull
-    @GeneratedValue
-    private Long promEnrollmentId;
-
-    @NotBlank
-    private String promEnrollmentCustomId;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID promEnrollmentId;
 
     @NotNull
     @OneToOne(cascade = CascadeType.ALL)

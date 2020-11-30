@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.persistence.GenerationType;
 import javax.validation.constraints.NotBlank;
 
 import javax.persistence.CascadeType;
@@ -15,6 +16,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -24,8 +26,8 @@ public class TripEntity {
 
     @Id
     @NotNull
-    @GeneratedValue
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID tripId;
 
     @NotBlank
     private String name;

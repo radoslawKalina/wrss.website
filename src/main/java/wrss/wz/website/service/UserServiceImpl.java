@@ -17,7 +17,6 @@ import wrss.wz.website.security.UserDetailsImpl;
 import wrss.wz.website.service.interfaces.UserService;
 
 import javax.transaction.Transactional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -38,7 +37,6 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 
         StudentEntity studentEntity = modelMapper.map(userRequest, StudentEntity.class);
         studentEntity.setPassword(bCryptPasswordEncoder.encode(userRequest.getPassword()));
-        studentEntity.setUserId(UUID.randomUUID().toString());
         studentEntity.addRole(roleRepository.findByRole("STUDENT"));
 
         StudentEntity savedUser = userRepository.save(studentEntity);

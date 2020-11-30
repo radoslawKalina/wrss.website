@@ -47,7 +47,7 @@ public class PromServiceImpl implements PromService {
 
     @Override
     @Transactional
-    public PromGetEnrollmentResponse get(String enrollmentId, String username) {
+    public PromGetEnrollmentResponse get(UUID enrollmentId, String username) {
 
         StudentEntity user = userRepository.findByUsername(username);
         PromEnrollmentEntity promEnrollmentEntity = getPromEnrollmentEntity(enrollmentId, user);
@@ -63,7 +63,6 @@ public class PromServiceImpl implements PromService {
 
         PromEnrollmentEntity enrollment = PromEnrollmentEntity.builder()
                                                               .user(user)
-                                                              .promEnrollmentCustomId(UUID.randomUUID().toString())
                                                               .mainPerson(mainPerson)
                                                               .message(promEnrollmentRequest.getMessage())
                                                               .build();
@@ -78,7 +77,7 @@ public class PromServiceImpl implements PromService {
 
     @Override
     @Transactional
-    public void update(PromEnrollmentPersonRequest promEnrollmentPersonRequest, String enrollmentId,
+    public void update(PromEnrollmentPersonRequest promEnrollmentPersonRequest, UUID enrollmentId,
                                          String person, String username) {
 
         StudentEntity user = userRepository.findByUsername(username);
@@ -92,9 +91,9 @@ public class PromServiceImpl implements PromService {
         promPersonRepository.save(promPersonEntityUpdated);
     }
 
-    private PromEnrollmentEntity getPromEnrollmentEntity(String enrollmentId, StudentEntity user) {
+    private PromEnrollmentEntity getPromEnrollmentEntity(UUID enrollmentId, StudentEntity user) {
 
-        PromEnrollmentEntity promEnrollmentEntity = promEnrollmentRepository.findByPromEnrollmentCustomId(enrollmentId);
+        PromEnrollmentEntity promEnrollmentEntity = promEnrollmentRepository.findByPromEnrollmentId(enrollmentId);
 
         if (promEnrollmentEntity == null) {
             throw new PromEnrollmentDoesNotExist("Prom enrollment with this Id does not exist");
