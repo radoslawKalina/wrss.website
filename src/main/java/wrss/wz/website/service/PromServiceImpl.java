@@ -65,6 +65,7 @@ public class PromServiceImpl implements PromService {
                                                               .user(user)
                                                               .mainPerson(mainPerson)
                                                               .message(promEnrollmentRequest.getMessage())
+                                                              .paid(false)
                                                               .build();
         if (promEnrollmentRequest.getType().equals("pair")) {
             PromPersonEntity partner = modelMapper.map(promEnrollmentRequest.getPartner(), PromPersonEntity.class);

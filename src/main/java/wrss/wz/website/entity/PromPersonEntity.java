@@ -34,4 +34,16 @@ public class PromPersonEntity {
 
     @NotBlank
     private String surname;
+
+    @NotBlank
+    private String mail;
+
+    @NotBlank
+    private String phoneNumber;
+
+    private Integer index;
+    private boolean fromAGH;
+    private String faculty;
+    private String field;
+    private Integer year;
 }

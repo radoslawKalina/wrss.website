@@ -4,7 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 @Data
 @NoArgsConstructor
@@ -16,4 +19,18 @@ public class PromEnrollmentPersonRequest {
 
     @NotBlank(message = "Surname field can't be blank")
     private String surname;
+
+    @Email(message = "Wrong value for email field. You need to provide email address")
+    @NotBlank(message = "Email field can't be blank")
+    private String mail;
+
+    @NotNull(message = "Phone number field can't be blank")
+    @Size(min = 9, max = 9, message = "Wrong value for phone number field. You need to provide valid phone number")
+    private String phoneNumber;
+
+    private Integer index;
+    private boolean fromAGH;
+    private String faculty;
+    private String field;
+    private Integer year;
 }
