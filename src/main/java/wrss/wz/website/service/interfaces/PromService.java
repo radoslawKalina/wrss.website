@@ -14,4 +14,5 @@ public interface PromService {
     PromEnrollmentResponse signUp(PromEnrollmentRequest promEnrollmentRequest, String username);
     PromEnrollmentPersonResponse update(PromEnrollmentPersonRequest promEnrollmentRequest, UUID enrollmentId,
                                         String person, String username);
+    void transfer(UUID enrollmentId, String newUsername, String username);
 }

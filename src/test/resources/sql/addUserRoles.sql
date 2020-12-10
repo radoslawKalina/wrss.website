@@ -1,0 +1,5 @@
+INSERT INTO ROLE_ENTITY(ROLE_ID, ROLE)
+VALUES
+       ('046b6c7f-0b8a-43b9-b35d-6489e6daee91', 'STUDENT'),
+       ('c49eb067-5a19-40c6-aec6-ea62f9cae13b', 'SUPER_ADMIN'),
+       ('f7a00c87-ac72-4616-867e-ee303e170fcb', 'ADMIN');

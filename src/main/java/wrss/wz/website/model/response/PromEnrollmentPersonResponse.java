@@ -12,8 +12,8 @@ public class PromEnrollmentPersonResponse {
     private String surname;
     private String email;
     private String phoneNumber;
-    private Integer index;
     private boolean fromAGH;
+    private Integer index;
     private String faculty;
     private String field;
     private Integer year;

@@ -13,8 +13,9 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import wrss.wz.website.exception.custom.PromEnrollmentDoesNotExist;
 import wrss.wz.website.exception.custom.PromPersonEntityNotExistException;
-import wrss.wz.website.exception.custom.RecordBelongsException;
+import wrss.wz.website.exception.custom.RecordBelongingException;
 import wrss.wz.website.exception.custom.UserAlreadyExistException;
+import wrss.wz.website.exception.custom.UserDoesNotExistException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,10 +48,10 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, BAD_REQUEST);
     }
 
-    @ExceptionHandler(RecordBelongsException.class)
+    @ExceptionHandler(RecordBelongingException.class)
     @ResponseStatus(BAD_REQUEST)
     @ResponseBody
-    public ResponseEntity<ErrorResponse> handleUserAlreadyExistException(RecordBelongsException exception) {
+    public ResponseEntity<ErrorResponse> handleUserAlreadyExistException(RecordBelongingException exception) {
         ErrorResponse errorResponse = new ErrorResponse(OperationNotAllowedForUser, Collections.singletonList(exception.getMessage()));
         return new ResponseEntity<>(errorResponse, BAD_REQUEST);
     }
@@ -59,6 +60,14 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ResponseStatus(BAD_REQUEST)
     @ResponseBody
     public ResponseEntity<ErrorResponse> handlePromEnrollmentDoesNotExist(PromEnrollmentDoesNotExist exception) {
+        ErrorResponse errorResponse = new ErrorResponse(InvalidRequestArgumentValue, Collections.singletonList(exception.getMessage()));
+        return new ResponseEntity<>(errorResponse, BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UserDoesNotExistException.class)
+    @ResponseStatus(BAD_REQUEST)
+    @ResponseBody
+    public ResponseEntity<ErrorResponse> handleUserDoesNotExistException(UserDoesNotExistException exception) {
         ErrorResponse errorResponse = new ErrorResponse(InvalidRequestArgumentValue, Collections.singletonList(exception.getMessage()));
         return new ResponseEntity<>(errorResponse, BAD_REQUEST);
     }

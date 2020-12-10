@@ -8,7 +8,8 @@ import wrss.wz.website.entity.PromPersonEntity;
 import wrss.wz.website.entity.StudentEntity;
 import wrss.wz.website.exception.custom.PromEnrollmentDoesNotExist;
 import wrss.wz.website.exception.custom.PromPersonEntityNotExistException;
-import wrss.wz.website.exception.custom.RecordBelongsException;
+import wrss.wz.website.exception.custom.RecordBelongingException;
+import wrss.wz.website.exception.custom.UserDoesNotExistException;
 import wrss.wz.website.model.request.PromEnrollmentPersonRequest;
 import wrss.wz.website.model.request.PromEnrollmentRequest;
 import wrss.wz.website.model.response.PromEnrollmentPersonResponse;
@@ -93,6 +94,23 @@ public class PromServiceImpl implements PromService {
         return modelMapper.map(updated, PromEnrollmentPersonResponse.class);
     }
 
+    @Override
+    @Transactional
+    public void transfer(UUID enrollmentId, String newUsername, String username) {
+
+        StudentEntity user = userRepository.findByUsername(username);
+        PromEnrollmentEntity promEnrollmentEntity = getPromEnrollmentEntity(enrollmentId, user);
+
+        StudentEntity newUser = userRepository.findByUsername(newUsername);
+
+        if (newUser == null) {
+            throw new UserDoesNotExistException("User to whom you try to transfer enrollment does not exist");
+        }
+
+        promEnrollmentEntity.setUser(newUser);
+        promEnrollmentRepository.save(promEnrollmentEntity);
+    }
+
     private PromEnrollmentEntity getPromEnrollmentEntity(UUID enrollmentId, StudentEntity user) {
 
         PromEnrollmentEntity promEnrollmentEntity = promEnrollmentRepository.findByPromEnrollmentId(enrollmentId);
@@ -102,7 +120,7 @@ public class PromServiceImpl implements PromService {
         }
 
         if (!user.getUsername().equals(promEnrollmentEntity.getUser().getUsername())) {
-            throw new RecordBelongsException("This record belong to another user");
+            throw new RecordBelongingException("This record belong to another user");
         }
 
         return promEnrollmentEntity;

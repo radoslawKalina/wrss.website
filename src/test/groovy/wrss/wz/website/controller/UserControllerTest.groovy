@@ -31,7 +31,7 @@ class UserControllerTest extends Specification {
 
     String URL = "/api/user"
     String ERROR_TYPE = "InvalidRequestArgumentValue"
-    String USER_ID = UUID.randomUUID().toString()
+    UUID USER_ID = UUID.randomUUID()
 
     @Subject
     private UserController userController
@@ -63,7 +63,7 @@ class UserControllerTest extends Specification {
         then:
             response.andExpect(status().isOk())
             response.andExpect(jsonPath('$.username').value(USERNAME))
-            response.andExpect(jsonPath('$.userId').value(USER_ID))
+            response.andExpect(jsonPath('$.userId').value(USER_ID.toString()))
         where:
             name | username | password
             NAME | USERNAME | PASSWORD
@@ -113,7 +113,6 @@ class UserControllerTest extends Specification {
             null | USERNAME  | PASSWORD | "name: Name field can't be blank"
             " "  | USERNAME  | PASSWORD | "name: Name field can't be blank"
             NAME | "noEmail" | PASSWORD | "username: Wrong value for username field. You need to provide email address"
-            NAME | " "       | PASSWORD | "username: Wrong value for username field. You need to provide email address"
             NAME | null      | PASSWORD | "username: Username field can't be blank"
             NAME | ""        | PASSWORD | "username: Username field can't be blank"
             NAME | USERNAME  | null     | "password: Password field can't be blank"
