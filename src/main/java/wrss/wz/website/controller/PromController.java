@@ -1,10 +1,6 @@
 package wrss.wz.website.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.json.JSONObject;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,6 +15,7 @@ import wrss.wz.website.model.response.PromEnrollmentPersonResponse;
 import wrss.wz.website.model.response.PromEnrollmentResponse;
 import wrss.wz.website.service.interfaces.PromService;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.UUID;
@@ -31,39 +28,41 @@ public class PromController {
     public final PromService promService;
 
     @GetMapping
-    public List<PromEnrollmentResponse> getAll(Authentication authentication) {
+    public List<PromEnrollmentResponse> getAll(HttpServletRequest request) {
 
-        String username = authentication.getPrincipal().toString();
+        String username = request.getAttribute("username").toString();
         return promService.getAll(username);
     }
 
     @GetMapping("/{enrollmentId}")
-    public PromEnrollmentResponse get(@PathVariable UUID enrollmentId, Authentication authentication) {
+    public PromEnrollmentResponse get(@PathVariable UUID enrollmentId, HttpServletRequest request) {
 
-        String username = authentication.getPrincipal().toString();
+        String username = request.getAttribute("username").toString();
         return promService.get(enrollmentId, username);
     }
 
     @PostMapping
-    public PromEnrollmentResponse signUp(@Valid @RequestBody PromEnrollmentRequest promEnrollmentRequest, Authentication authentication) {
+    public PromEnrollmentResponse signUp(@Valid @RequestBody PromEnrollmentRequest promEnrollmentRequest,
+                                         HttpServletRequest request) {
 
-        String username = authentication.getPrincipal().toString();
+        String username = request.getAttribute("username").toString();
         return promService.signUp(promEnrollmentRequest, username);
     }
 
     @PutMapping("/{enrollmentId}/{person}")
     public PromEnrollmentPersonResponse update(@Valid @RequestBody PromEnrollmentPersonRequest promEnrollmentPersonRequest,
-                                               @PathVariable UUID enrollmentId, @PathVariable String person, Authentication authentication) {
+                                               @PathVariable UUID enrollmentId, @PathVariable String person,
+                                               HttpServletRequest request) {
 
-        String username = authentication.getPrincipal().toString();
+        String username = request.getAttribute("username").toString();
         return promService.update(promEnrollmentPersonRequest, enrollmentId, person, username);
     }
 
     @PutMapping("/{enrollmentId}/transfer/{newUsername}")
     public DefaultResponse transfer(@PathVariable UUID enrollmentId, @PathVariable String newUsername,
-                                    Authentication authentication) {
+                                    HttpServletRequest request) {
 
-        String username = authentication.getPrincipal().toString();
+        String username = request.getAttribute("username").toString();
         promService.transfer(enrollmentId, newUsername, username);
 
         return new DefaultResponse(String.format("Enrollment successfully transferred to %s", newUsername));
