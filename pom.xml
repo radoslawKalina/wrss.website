@@ -122,29 +122,6 @@
 		<plugins>
 
 			<plugin>
-				<groupId>org.codehaus.gmavenplus</groupId>
-				<artifactId>gmavenplus-plugin</artifactId>
-				<version>1.6.2</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>compileTests</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<testSources>
-						<testSource>
-							<directory>${project.basedir}/src/test/groovy</directory>
-							<includes>
-								<include>**/*.groovy</include>
-							</includes>
-						</testSource>
-					</testSources>
-				</configuration>
-			</plugin>
-
-			<plugin>
 				<groupId>org.asciidoctor</groupId>
 				<artifactId>asciidoctor-maven-plugin</artifactId>
 				<version>1.6.0</version>
