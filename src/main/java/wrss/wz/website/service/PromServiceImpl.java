@@ -130,7 +130,7 @@ public class PromServiceImpl implements PromService {
 
         PromPersonEntity promPersonEntity = null;
 
-        if (person.equals("main")) {
+        if (person.equals("mainPerson")) {
             promPersonEntity = promEnrollmentEntity.getMainPerson();
 
         } else if (person.equals("partner")) {

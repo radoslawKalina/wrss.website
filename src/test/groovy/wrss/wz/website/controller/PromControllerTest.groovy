@@ -8,7 +8,9 @@ import spock.lang.Subject
 import spock.lang.Unroll
 import wrss.wz.website.exception.RestExceptionHandler
 import wrss.wz.website.exception.custom.PromEnrollmentDoesNotExist
+import wrss.wz.website.exception.custom.PromPersonEntityNotExistException
 import wrss.wz.website.exception.custom.RecordBelongingException
+import wrss.wz.website.exception.custom.UserDoesNotExistException
 import wrss.wz.website.model.request.PromEnrollmentPersonRequest
 import wrss.wz.website.model.request.PromEnrollmentRequest
 import wrss.wz.website.model.response.PromEnrollmentPersonResponse
@@ -17,6 +19,7 @@ import wrss.wz.website.service.PromServiceImpl
 
 import static org.springframework.http.MediaType.APPLICATION_JSON
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -378,5 +381,171 @@ class PromControllerTest extends Specification {
             "firstName"   | "firstSurname"   | "first@gmail.com"  | "123456789"  | true     | "284277" | "WZ"     | "IiE"  | 2     |
             "partnerName" | "partnerSurname" | "second@gmail.com" | "badValue"   | true     | "284255" | "WZ"     | "ZiIP" | 5     |
             "pair"        | "message"        | "partner.phoneNumber: Wrong value for phone number field. You need to provide valid phone number"
+    }
+
+    def "should update mainPerson data and response with 200"() {
+        given:
+            PromEnrollmentPersonRequest personToUpdate = new PromEnrollmentPersonRequest("updatedName", "updatedSurname",
+                "updated@gmail.com", "345678901", true, 294242, "WIMiR", "IMiM", 3)
+            PromEnrollmentPersonResponse updatedPerson = new PromEnrollmentPersonResponse("updatedName", "updatedSurname",
+                "updated@gmail.com", "345678901", true, 294242, "WIMiR", "IMiM", 3)
+        when:
+            def response = mockMvc.perform(put(String.format("%s/%s/mainPerson", URL, enrollmentId.toString()))
+                                  .content(JsonOutput.toJson(personToUpdate))
+                                  .requestAttr("username", "test@gmail.com")
+                                  .contentType(APPLICATION_JSON))
+        then:
+            1 * promService.update(personToUpdate, enrollmentId, "mainPerson", "test@gmail.com") >> updatedPerson
+        then:
+            response.andExpect(status().isOk())
+            response.andExpect(jsonPath('$.name').value(updatedPerson.getName()))
+            response.andExpect(jsonPath('$.surname').value(updatedPerson.getSurname()))
+            response.andExpect(jsonPath('$.email').value(updatedPerson.getEmail()))
+            response.andExpect(jsonPath('$.phoneNumber').value(updatedPerson.getPhoneNumber()))
+    }
+
+    @Unroll
+    def "should respond with 400 and custom error message when request is not valid when update"() {
+        given:
+            Map person = [
+                name: name,
+                surname: surname,
+                email: email,
+                phoneNumber: phoneNumber,
+                fromAGH: fromAGH,
+                index: null,
+                faculty: null,
+                field: null,
+                year: null
+            ]
+        when:
+            def response = mockMvc.perform(put(String.format("%s/%s/mainPerson", URL, enrollmentId.toString()))
+                                  .content(JsonOutput.toJson(person))
+                                  .requestAttr("username", "test@gmail.com")
+                                  .contentType(APPLICATION_JSON))
+        then:
+            response.andExpect(status().isBadRequest())
+            response.andExpect(jsonPath('$.errorType').value("InvalidRequestArgumentValue"))
+            response.andExpect(jsonPath('$.errorMessage[0]').value(errorMessage))
+        where:
+            name        | surname        | email            | phoneNumber | fromAGH | errorMessage
+            null        | "firstSurname" | "test@gmail.com" | "123456789" | false   | "name: Name field can't be blank"
+            " "         | "firstSurname" | "test@gmail.com" | "123456789" | false   | "name: Name field can't be blank"
+            "firstName" | null           | "test@gmail.com" | "123456789" | false   | "surname: Surname field can't be blank"
+            "firstName" | " "            | "test@gmail.com" | "123456789" | false   | "surname: Surname field can't be blank"
+            "firstName" | "firstSurname" | null             | "123456789" | false   | "email: Email field can't be blank"
+            "firstName" | "firstSurname" | ""               | "123456789" | false   | "email: Email field can't be blank"
+            "firstName" | "firstSurname" | "badValue"       | "123456789" | false   | "email: Wrong value for email field. You need to provide email address"
+            "firstName" | "firstSurname" | "test@gmail.com" | null        | false   | "phoneNumber: Phone number field can't be blank"
+            "firstName" | "firstSurname" | "test@gmail.com" | ""          | false   | "phoneNumber: Wrong value for phone number field. You need to provide valid phone number"
+            "firstName" | "firstSurname" | "test@gmail.com" | "badValue"  | false   | "phoneNumber: Wrong value for phone number field. You need to provide valid phone number"
+    }
+
+    def "should return with 400 and custom exception when updating person is not possible because wrong path parameter provided"() {
+        given:
+            PromEnrollmentPersonRequest personToUpdate = new PromEnrollmentPersonRequest("updatedName", "updatedSurname",
+                "updated@gmail.com", "345678901", true, 294242, "WIMiR", "IMiM", 3)
+        when:
+            def response = mockMvc.perform(put(String.format("%s/%s/wrongValue", URL, enrollmentId.toString()))
+                                  .content(JsonOutput.toJson(personToUpdate))
+                                  .requestAttr("username", "test@gmail.com")
+                                  .contentType(APPLICATION_JSON))
+        then:
+            1 * promService.update(personToUpdate, enrollmentId, "wrongValue", "test@gmail.com") >>
+                    {throw new PromPersonEntityNotExistException("Person to update does not exist")}
+        then:
+            response.andExpect(status().isBadRequest())
+            response.andExpect(jsonPath('$.errorType').value("InvalidRequestArgumentValue"))
+            response.andExpect(jsonPath('$.errorMessage[0]').value("Person to update does not exist"))
+    }
+
+    def "should return with 400 and custom exception when enrollment with given id does not exist"() {
+        given:
+            PromEnrollmentPersonRequest personToUpdate = new PromEnrollmentPersonRequest("updatedName", "updatedSurname",
+                "updated@gmail.com", "345678901", true, 294242, "WIMiR", "IMiM", 3)
+        when:
+            def response = mockMvc.perform(put(String.format("%s/%s/mainPerson", URL, enrollmentId.toString()))
+                                  .content(JsonOutput.toJson(personToUpdate))
+                                  .requestAttr("username", "test@gmail.com")
+                                  .contentType(APPLICATION_JSON))
+        then:
+            1 * promService.update(personToUpdate, enrollmentId, "mainPerson", "test@gmail.com") >>
+                {throw new PromEnrollmentDoesNotExist("Prom enrollment with this Id does not exist")}
+        then:
+            response.andExpect(status().isBadRequest())
+            response.andExpect(jsonPath('$.errorType').value("InvalidRequestArgumentValue"))
+            response.andExpect(jsonPath('$.errorMessage[0]').value("Prom enrollment with this Id does not exist"))
+    }
+
+    def "should return with 400 and custom exception when user try to update enrollment which not belongs to him"() {
+        given:
+            PromEnrollmentPersonRequest personToUpdate = new PromEnrollmentPersonRequest("updatedName", "updatedSurname",
+                "updated@gmail.com", "345678901", true, 294242, "WIMiR", "IMiM", 3)
+        when:
+            def response = mockMvc.perform(put(String.format("%s/%s/mainPerson", URL, secondEnrollmentId.toString()))
+                                  .content(JsonOutput.toJson(personToUpdate))
+                                  .requestAttr("username", "test@gmail.com")
+                                  .contentType(APPLICATION_JSON))
+        then:
+            1 * promService.update(personToUpdate, secondEnrollmentId, "mainPerson", "test@gmail.com") >>
+                {throw new RecordBelongingException("This record belong to another user")}
+        then:
+            response.andExpect(status().isBadRequest())
+            response.andExpect(jsonPath('$.errorType').value("OperationNotAllowedForUser"))
+            response.andExpect(jsonPath('$.errorMessage[0]').value("This record belong to another user"))
+    }
+
+    def "should transfer enrollment to another person"() {
+        when:
+            def response = mockMvc.perform(put(String.format("%s/%s/transfer/?newUsername=%s", URL, enrollmentId.toString(), "new@gmail.com"))
+                                  .requestAttr("username", "test@gmail.com")
+                                  .contentType(APPLICATION_JSON))
+        then:
+            1 * promService.transfer(enrollmentId, "new@gmail.com", "test@gmail.com")
+        then:
+            response.andExpect(status().isOk())
+            response.andExpect(jsonPath('$.action').value("Enrollment successfully transferred to new@gmail.com"))
+    }
+
+    def "should return with 400 and custom exception when user to whom enrollment transfer targeting does not exist"() {
+        when:
+            def response = mockMvc.perform(put(String.format("%s/%s/transfer/?newUsername=%s", URL, enrollmentId.toString(), "new@gmail.com"))
+                                  .requestAttr("username", "test@gmail.com")
+                                  .contentType(APPLICATION_JSON))
+        then:
+            1 * promService.transfer(enrollmentId, "new@gmail.com", "test@gmail.com") >>
+                    {throw new UserDoesNotExistException("User to whom you try to transfer enrollment does not exist")}
+        then:
+            response.andExpect(status().isBadRequest())
+            response.andExpect(jsonPath('$.errorType').value("InvalidRequestArgumentValue"))
+            response.andExpect(jsonPath('$.errorMessage[0]').value("User to whom you try to transfer enrollment does not exist"))
+    }
+
+    def "should return with 400 and custom exception when user try to transfer enrollment which does not exist"() {
+        when:
+            def response = mockMvc.perform(put(String.format("%s/%s/transfer/?newUsername=%s", URL, enrollmentId.toString(), "new@gmail.com"))
+                                  .requestAttr("username", "test@gmail.com")
+                                  .contentType(APPLICATION_JSON))
+        then:
+            1 * promService.transfer(enrollmentId, "new@gmail.com", "test@gmail.com") >>
+                {throw new PromEnrollmentDoesNotExist("Prom enrollment with this Id does not exist")}
+        then:
+            response.andExpect(status().isBadRequest())
+            response.andExpect(jsonPath('$.errorType').value("InvalidRequestArgumentValue"))
+            response.andExpect(jsonPath('$.errorMessage[0]').value("Prom enrollment with this Id does not exist"))
+    }
+
+    def "should return with 400 and custom exception when user try to transfer enrollment which does not belong to him"() {
+        when:
+            def response = mockMvc.perform(put(String.format("%s/%s/transfer/?newUsername=%s", URL, enrollmentId.toString(), "new@gmail.com"))
+                                  .requestAttr("username", "test@gmail.com")
+                                  .contentType(APPLICATION_JSON))
+        then:
+            1 * promService.transfer(enrollmentId, "new@gmail.com", "test@gmail.com") >>
+                {throw new RecordBelongingException("This record belong to another user")}
+        then:
+        response.andExpect(status().isBadRequest())
+        response.andExpect(jsonPath('$.errorType').value("OperationNotAllowedForUser"))
+        response.andExpect(jsonPath('$.errorMessage[0]').value("This record belong to another user"))
     }
 }

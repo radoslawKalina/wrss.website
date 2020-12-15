@@ -190,7 +190,7 @@ public class PromServiceH2Test {
                 "first.user@gmail.com", "123456789", true, 284266, "WZ", "IiE", 2);
 
         PromEnrollmentPersonResponse response = promService.update(updatedPerson, enrollmentId,
-                "main", "first.user@gmail.com");
+                "mainPerson", "first.user@gmail.com");
 
         assertThat(response).isEqualTo(modelMapper.map(updatedPerson, PromEnrollmentPersonResponse.class));
 
@@ -231,5 +231,18 @@ public class PromServiceH2Test {
         assertThat(promPersonEntity.getField()).isEqualTo(updatedPerson.getField());
         assertThat(promPersonEntity.getYear()).isEqualTo(updatedPerson.getYear());
         assertThat(promPersonEntity.isFromAGH()).isEqualTo(updatedPerson.isFromAGH());
+    }
+
+    @Test
+    public void shouldTransferEnrollmentToAnotherUser() {
+
+        String username = "first.user@gmail.com";
+        String newUsername = "second.user@gmail.com";
+        UUID enrollmentId = UUID.fromString("0d7f96e5-1e06-4405-bf1a-c4c4a010fd27");
+
+        promService.transfer(enrollmentId, newUsername, username);
+
+        PromEnrollmentEntity promEnrollmentEntity = promEnrollmentRepository.findByPromEnrollmentId(enrollmentId);
+        assertThat(promEnrollmentEntity.getUser().getUsername()).isEqualTo(newUsername);
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import wrss.wz.website.model.request.PromEnrollmentPersonRequest;
 import wrss.wz.website.model.request.PromEnrollmentRequest;
@@ -58,8 +59,8 @@ public class PromController {
         return promService.update(promEnrollmentPersonRequest, enrollmentId, person, username);
     }
 
-    @PutMapping("/{enrollmentId}/transfer/{newUsername}")
-    public DefaultResponse transfer(@PathVariable UUID enrollmentId, @PathVariable String newUsername,
+    @PutMapping("/{enrollmentId}/transfer")
+    public DefaultResponse transfer(@PathVariable UUID enrollmentId, @RequestParam String newUsername,
                                     HttpServletRequest request) {
 
         String username = request.getAttribute("username").toString();

@@ -11,6 +11,7 @@ import wrss.wz.website.entity.TripEntity
 import wrss.wz.website.exception.custom.PromEnrollmentDoesNotExist
 import wrss.wz.website.exception.custom.PromPersonEntityNotExistException
 import wrss.wz.website.exception.custom.RecordBelongingException
+import wrss.wz.website.exception.custom.UserDoesNotExistException
 import wrss.wz.website.model.request.PromEnrollmentPersonRequest
 import wrss.wz.website.repository.PromEnrollmentRepository
 import wrss.wz.website.repository.PromPersonRepository
@@ -76,7 +77,7 @@ class PromServiceTest extends Specification {
         given:
             UUID id = UUID.randomUUID()
         when:
-            promServiceImpl.update(new PromEnrollmentPersonRequest(), id, "main", "First")
+            promServiceImpl.update(new PromEnrollmentPersonRequest(), id, "mainPerson", "First")
         then:
             1 * userRepository.findByUsername("First") >> user
             1 * promEnrollmentRepository.findByPromEnrollmentId(id) >> null
@@ -88,7 +89,7 @@ class PromServiceTest extends Specification {
         given:
             UUID id = enrollment.getPromEnrollmentId();
         when:
-            promServiceImpl.update(new PromEnrollmentPersonRequest(), id, "main", "First")
+            promServiceImpl.update(new PromEnrollmentPersonRequest(), id, "mainPerson", "First")
         then:
             1 * userRepository.findByUsername("First") >> user
             1 * promEnrollmentRepository.findByPromEnrollmentId(enrollment.getPromEnrollmentId()) >> enrollment
@@ -120,5 +121,38 @@ class PromServiceTest extends Specification {
             1 * promEnrollmentRepository.findByPromEnrollmentId(singleEnrollment.getPromEnrollmentId()) >> singleEnrollment
         then:
             thrown(PromPersonEntityNotExistException)
+    }
+
+    def "should throw PromEnrollmentDoesNotExist when user try to transfer enrollment which does not exist"() {
+        given:
+            UUID id = UUID.randomUUID()
+        when:
+            promServiceImpl.transfer(id, "Second", "First")
+        then:
+            1 * userRepository.findByUsername("First") >> user
+            1 * promEnrollmentRepository.findByPromEnrollmentId(id) >> null
+        then:
+            thrown(PromEnrollmentDoesNotExist)
+    }
+
+    def "should throw RecordBelongingException when user try to transfer enrollment which belong to another user"() {
+        when:
+            promServiceImpl.transfer(enrollment.getPromEnrollmentId(), "Second", "First")
+        then:
+            1 * userRepository.findByUsername("First") >> user
+            1 * promEnrollmentRepository.findByPromEnrollmentId(enrollment.getPromEnrollmentId()) >> enrollment
+        then:
+            thrown(RecordBelongingException)
+    }
+
+    def "should throw UserDoesNotExistException when user try to transfer enrollment to user which does not exist"() {
+        when:
+            promServiceImpl.transfer(enrollment.getPromEnrollmentId(), "First", "Second")
+        then:
+            1 * userRepository.findByUsername("Second") >> secondUser
+            1 * promEnrollmentRepository.findByPromEnrollmentId(enrollment.getPromEnrollmentId()) >> enrollment
+            1 * userRepository.findByUsername("First") >> null
+        then:
+            thrown(UserDoesNotExistException)
     }
 }
