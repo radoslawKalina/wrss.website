@@ -29,42 +29,42 @@ public class PromController {
     public final PromService promService;
 
     @GetMapping
-    public List<PromEnrollmentResponse> getAll(HttpServletRequest request) {
+    public List<PromEnrollmentResponse> getOwnEnrollments(HttpServletRequest request) {
 
         String username = request.getAttribute("username").toString();
-        return promService.getAll(username);
+        return promService.getOwnEnrollments(username);
     }
 
     @GetMapping("/{enrollmentId}")
-    public PromEnrollmentResponse get(@PathVariable UUID enrollmentId, HttpServletRequest request) {
+    public PromEnrollmentResponse getEnrollment(@PathVariable UUID enrollmentId, HttpServletRequest request) {
 
         String username = request.getAttribute("username").toString();
-        return promService.get(enrollmentId, username);
+        return promService.getEnrollment(enrollmentId, username);
     }
 
     @PostMapping
-    public PromEnrollmentResponse signUp(@Valid @RequestBody PromEnrollmentRequest promEnrollmentRequest,
-                                         HttpServletRequest request) {
+    public PromEnrollmentResponse createEnrollment(@Valid @RequestBody PromEnrollmentRequest promEnrollmentRequest,
+                                                   HttpServletRequest request) {
 
         String username = request.getAttribute("username").toString();
-        return promService.signUp(promEnrollmentRequest, username);
+        return promService.createEnrollment(promEnrollmentRequest, username);
     }
 
-    @PutMapping("/{enrollmentId}/{person}")
-    public PromEnrollmentPersonResponse update(@Valid @RequestBody PromEnrollmentPersonRequest promEnrollmentPersonRequest,
-                                               @PathVariable UUID enrollmentId, @PathVariable String person,
-                                               HttpServletRequest request) {
+    @PutMapping("/{enrollmentId}")
+    public PromEnrollmentPersonResponse updateEnrollment(@Valid @RequestBody PromEnrollmentPersonRequest promEnrollmentPersonRequest,
+                                                         @PathVariable UUID enrollmentId, @RequestParam String person,
+                                                         HttpServletRequest request) {
 
         String username = request.getAttribute("username").toString();
-        return promService.update(promEnrollmentPersonRequest, enrollmentId, person, username);
+        return promService.updateEnrollment(promEnrollmentPersonRequest, enrollmentId, person, username);
     }
 
     @PutMapping("/{enrollmentId}/transfer")
-    public DefaultResponse transfer(@PathVariable UUID enrollmentId, @RequestParam String newUsername,
-                                    HttpServletRequest request) {
+    public DefaultResponse transferEnrollment(@PathVariable UUID enrollmentId, @RequestParam String newUsername,
+                                              HttpServletRequest request) {
 
         String username = request.getAttribute("username").toString();
-        promService.transfer(enrollmentId, newUsername, username);
+        promService.transferEnrollment(enrollmentId, newUsername, username);
 
         return new DefaultResponse(String.format("Enrollment successfully transferred to %s", newUsername));
     }

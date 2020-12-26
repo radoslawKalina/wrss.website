@@ -57,7 +57,7 @@ public class PromServiceH2Test {
     @Test
     public void shouldReturnEmptyListWhenGetAllEnrollmentsButAnyBelongToUser() {
 
-        List<PromEnrollmentResponse> responseList = promService.getAll("third.user@gmail.com");
+        List<PromEnrollmentResponse> responseList = promService.getOwnEnrollments("third.user@gmail.com");
 
         assertThat(responseList).hasSize(0);
     }
@@ -65,7 +65,7 @@ public class PromServiceH2Test {
     @Test
     public void shouldReturnAllEnrollmentsBelongingToUser() {
 
-        List<PromEnrollmentResponse> responseList = promService.getAll("first.user@gmail.com");
+        List<PromEnrollmentResponse> responseList = promService.getOwnEnrollments("first.user@gmail.com");
 
         assertThat(responseList).hasSize(2);
     }
@@ -79,7 +79,7 @@ public class PromServiceH2Test {
         PromEnrollmentPersonResponse partner = new PromEnrollmentPersonResponse("thirdName", "thirdSurname",
                 "third.user@gmail.com", "345678901", true, 301245, "WIMIP", "IMiM", 3);
 
-        PromEnrollmentResponse response = promService.get(enrollmentId, "first.user@gmail.com");
+        PromEnrollmentResponse response = promService.getEnrollment(enrollmentId, "first.user@gmail.com");
 
         assertThat(response.getPromEnrollmentId()).isEqualTo(enrollmentId);
         assertThat(response.getMainPerson()).isEqualTo(mainPerson);
@@ -95,7 +95,7 @@ public class PromServiceH2Test {
         PromEnrollmentPersonResponse mainPerson = new PromEnrollmentPersonResponse("secondName", "secondSurname",
                 "second.user@gmail.com", "234567890", true, 284211, "WZ", "IiE", 4);
 
-        PromEnrollmentResponse response = promService.get(enrollmentId, "second.user@gmail.com");
+        PromEnrollmentResponse response = promService.getEnrollment(enrollmentId, "second.user@gmail.com");
 
         assertThat(response.getPromEnrollmentId()).isEqualTo(enrollmentId);
         assertThat(response.getMainPerson()).isEqualTo(mainPerson);
@@ -114,7 +114,7 @@ public class PromServiceH2Test {
                 "third.user@gmail.com", "345678901", true, 301245, "WIMIP", "IMiM", 3);
         PromEnrollmentRequest promEnrollmentRequest = new PromEnrollmentRequest("pair", mainPerson, partner, "firstMessage");
 
-        PromEnrollmentResponse response = promService.signUp(promEnrollmentRequest, "first.user@gmail.com");
+        PromEnrollmentResponse response = promService.createEnrollment(promEnrollmentRequest, "first.user@gmail.com");
 
         assertThat(response.getPromEnrollmentId()).isNotNull();
         assertThat(response.getMainPerson()).isEqualTo(modelMapper.map(mainPerson, PromEnrollmentPersonResponse.class));
@@ -138,7 +138,7 @@ public class PromServiceH2Test {
                 "first.user@gmail.com", "123456789", true, 284266, "WZ", "IiE", 2);
         PromEnrollmentRequest promEnrollmentRequest = new PromEnrollmentRequest("single", mainPerson, null, "firstMessage");
 
-        PromEnrollmentResponse response = promService.signUp(promEnrollmentRequest, "first.user@gmail.com");
+        PromEnrollmentResponse response = promService.createEnrollment(promEnrollmentRequest, "first.user@gmail.com");
 
         assertThat(response.getPromEnrollmentId()).isNotNull();
         assertThat(response.getMainPerson()).isEqualTo(modelMapper.map(mainPerson, PromEnrollmentPersonResponse.class));
@@ -164,7 +164,7 @@ public class PromServiceH2Test {
                 "third.user@gmail.com", "345678901", true, 301245, "WIMIP", "IMiM", 3);
         PromEnrollmentRequest promEnrollmentRequest = new PromEnrollmentRequest("single", mainPerson, partner, "firstMessage");
 
-        PromEnrollmentResponse response = promService.signUp(promEnrollmentRequest, "first.user@gmail.com");
+        PromEnrollmentResponse response = promService.createEnrollment(promEnrollmentRequest, "first.user@gmail.com");
 
         assertThat(response.getPromEnrollmentId()).isNotNull();
         assertThat(response.getMainPerson()).isEqualTo(modelMapper.map(mainPerson, PromEnrollmentPersonResponse.class));
@@ -189,7 +189,7 @@ public class PromServiceH2Test {
         PromEnrollmentPersonRequest updatedPerson = new PromEnrollmentPersonRequest("UpdatedFirstName", "UpdatedFirstSurname",
                 "first.user@gmail.com", "123456789", true, 284266, "WZ", "IiE", 2);
 
-        PromEnrollmentPersonResponse response = promService.update(updatedPerson, enrollmentId,
+        PromEnrollmentPersonResponse response = promService.updateEnrollment(updatedPerson, enrollmentId,
                 "mainPerson", "first.user@gmail.com");
 
         assertThat(response).isEqualTo(modelMapper.map(updatedPerson, PromEnrollmentPersonResponse.class));
@@ -215,7 +215,7 @@ public class PromServiceH2Test {
         PromEnrollmentPersonRequest updatedPerson = new PromEnrollmentPersonRequest("UpdatedThirdName", "UpdatedThirdSurname",
                 "first.user@gmail.com", "123456789", true, 284266, "WZ", "IiE", 2);
 
-        PromEnrollmentPersonResponse response = promService.update(updatedPerson, enrollmentId,
+        PromEnrollmentPersonResponse response = promService.updateEnrollment(updatedPerson, enrollmentId,
                 "partner", "first.user@gmail.com");
 
         assertThat(response).isEqualTo(modelMapper.map(updatedPerson, PromEnrollmentPersonResponse.class));
@@ -240,7 +240,7 @@ public class PromServiceH2Test {
         String newUsername = "second.user@gmail.com";
         UUID enrollmentId = UUID.fromString("0d7f96e5-1e06-4405-bf1a-c4c4a010fd27");
 
-        promService.transfer(enrollmentId, newUsername, username);
+        promService.transferEnrollment(enrollmentId, newUsername, username);
 
         PromEnrollmentEntity promEnrollmentEntity = promEnrollmentRepository.findByPromEnrollmentId(enrollmentId);
         assertThat(promEnrollmentEntity.getUser().getUsername()).isEqualTo(newUsername);

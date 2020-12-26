@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.UUID;
 
 public interface PromService {
-    List<PromEnrollmentResponse> getAll(String username);
-    PromEnrollmentResponse get(UUID enrollmentId, String username);
-    PromEnrollmentResponse signUp(PromEnrollmentRequest promEnrollmentRequest, String username);
-    PromEnrollmentPersonResponse update(PromEnrollmentPersonRequest promEnrollmentRequest, UUID enrollmentId,
-                                        String person, String username);
-    void transfer(UUID enrollmentId, String newUsername, String username);
+    List<PromEnrollmentResponse> getOwnEnrollments(String username);
+    PromEnrollmentResponse getEnrollment(UUID enrollmentId, String username);
+    PromEnrollmentResponse createEnrollment(PromEnrollmentRequest promEnrollmentRequest, String username);
+    PromEnrollmentPersonResponse updateEnrollment(PromEnrollmentPersonRequest promEnrollmentRequest, UUID enrollmentId,
+                                                  String person, String username);
+    void transferEnrollment(UUID enrollmentId, String newUsername, String username);
 }

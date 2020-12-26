@@ -71,7 +71,7 @@ class PromControllerTest extends Specification {
                                   .requestAttr("username", "test@gmail.com")
                                   .contentType(APPLICATION_JSON))
         then:
-            1 * promService.getAll("test@gmail.com") >> [pairResponse, singleResponse]
+            1 * promService.getOwnEnrollments("test@gmail.com") >> [pairResponse, singleResponse]
         then:
             response.andExpect(status().isOk())
             response.andExpect(jsonPath('$.[0].promEnrollmentId').value(pairResponse.getPromEnrollmentId().toString()))
@@ -93,7 +93,7 @@ class PromControllerTest extends Specification {
                                   .requestAttr("username", "test@gmail.com")
                                   .contentType(APPLICATION_JSON))
         then:
-            1 * promService.getAll("test@gmail.com") >> []
+            1 * promService.getOwnEnrollments("test@gmail.com") >> []
         then:
             response.andExpect(status().isOk())
             response.andExpect(jsonPath('$.[0]').doesNotExist())
@@ -105,7 +105,7 @@ class PromControllerTest extends Specification {
                                   .requestAttr("username", "test@gmail.com")
                                   .contentType(APPLICATION_JSON))
         then:
-            1 * promService.get(enrollmentId, "test@gmail.com") >> pairResponse
+            1 * promService.getEnrollment(enrollmentId, "test@gmail.com") >> pairResponse
         then:
             response.andExpect(status().isOk())
             response.andExpect(jsonPath('$.promEnrollmentId').value(pairResponse.getPromEnrollmentId().toString()))
@@ -121,7 +121,7 @@ class PromControllerTest extends Specification {
                               .requestAttr("username", "test@gmail.com")
                               .contentType(APPLICATION_JSON))
         then:
-            1 * promService.get(enrollmentId, "test@gmail.com") >>
+            1 * promService.getEnrollment(enrollmentId, "test@gmail.com") >>
                     {throw new PromEnrollmentDoesNotExist("Prom enrollment with this Id does not exist")}
         then:
         response.andExpect(status().isBadRequest())
@@ -135,7 +135,7 @@ class PromControllerTest extends Specification {
                                   .requestAttr("username", "test@gmail.com")
                                   .contentType(APPLICATION_JSON))
         then:
-            1 * promService.get(enrollmentId, "test@gmail.com") >>
+            1 * promService.getEnrollment(enrollmentId, "test@gmail.com") >>
                     {throw new RecordBelongingException("This record belong to another user")}
         then:
             response.andExpect(status().isBadRequest())
@@ -150,7 +150,7 @@ class PromControllerTest extends Specification {
                                   .requestAttr("username", "test@gmail.com")
                                   .contentType(APPLICATION_JSON))
         then:
-            1 * promService.signUp(pairRequest, "test@gmail.com") >> pairResponse
+            1 * promService.createEnrollment(pairRequest, "test@gmail.com") >> pairResponse
         then:
             response.andExpect(status().isOk())
             response.andExpect(jsonPath('$.promEnrollmentId').value(enrollmentId.toString()))
@@ -165,7 +165,7 @@ class PromControllerTest extends Specification {
                                   .requestAttr("username", "test@gmail.com")
                                   .contentType(APPLICATION_JSON))
         then:
-            1 * promService.signUp(singleRequest, "test@gmail.com") >> singleResponse
+            1 * promService.createEnrollment(singleRequest, "test@gmail.com") >> singleResponse
         then:
             response.andExpect(status().isOk())
             response.andExpect(jsonPath('$.promEnrollmentId').value(secondEnrollmentId.toString()))
@@ -390,12 +390,12 @@ class PromControllerTest extends Specification {
             PromEnrollmentPersonResponse updatedPerson = new PromEnrollmentPersonResponse("updatedName", "updatedSurname",
                 "updated@gmail.com", "345678901", true, 294242, "WIMiR", "IMiM", 3)
         when:
-            def response = mockMvc.perform(put(String.format("%s/%s/mainPerson", URL, enrollmentId.toString()))
+            def response = mockMvc.perform(put(String.format("%s/%s/?person=mainPerson", URL, enrollmentId.toString()))
                                   .content(JsonOutput.toJson(personToUpdate))
                                   .requestAttr("username", "test@gmail.com")
                                   .contentType(APPLICATION_JSON))
         then:
-            1 * promService.update(personToUpdate, enrollmentId, "mainPerson", "test@gmail.com") >> updatedPerson
+            1 * promService.updateEnrollment(personToUpdate, enrollmentId, "mainPerson", "test@gmail.com") >> updatedPerson
         then:
             response.andExpect(status().isOk())
             response.andExpect(jsonPath('$.name').value(updatedPerson.getName()))
@@ -419,7 +419,7 @@ class PromControllerTest extends Specification {
                 year: null
             ]
         when:
-            def response = mockMvc.perform(put(String.format("%s/%s/mainPerson", URL, enrollmentId.toString()))
+            def response = mockMvc.perform(put(String.format("%s/%s/?person=mainPerson", URL, enrollmentId.toString()))
                                   .content(JsonOutput.toJson(person))
                                   .requestAttr("username", "test@gmail.com")
                                   .contentType(APPLICATION_JSON))
@@ -446,12 +446,12 @@ class PromControllerTest extends Specification {
             PromEnrollmentPersonRequest personToUpdate = new PromEnrollmentPersonRequest("updatedName", "updatedSurname",
                 "updated@gmail.com", "345678901", true, 294242, "WIMiR", "IMiM", 3)
         when:
-            def response = mockMvc.perform(put(String.format("%s/%s/wrongValue", URL, enrollmentId.toString()))
+            def response = mockMvc.perform(put(String.format("%s/%s/?person=wrongValue", URL, enrollmentId.toString()))
                                   .content(JsonOutput.toJson(personToUpdate))
                                   .requestAttr("username", "test@gmail.com")
                                   .contentType(APPLICATION_JSON))
         then:
-            1 * promService.update(personToUpdate, enrollmentId, "wrongValue", "test@gmail.com") >>
+            1 * promService.updateEnrollment(personToUpdate, enrollmentId, "wrongValue", "test@gmail.com") >>
                     {throw new PromPersonEntityNotExistException("Person to update does not exist")}
         then:
             response.andExpect(status().isBadRequest())
@@ -464,12 +464,12 @@ class PromControllerTest extends Specification {
             PromEnrollmentPersonRequest personToUpdate = new PromEnrollmentPersonRequest("updatedName", "updatedSurname",
                 "updated@gmail.com", "345678901", true, 294242, "WIMiR", "IMiM", 3)
         when:
-            def response = mockMvc.perform(put(String.format("%s/%s/mainPerson", URL, enrollmentId.toString()))
+            def response = mockMvc.perform(put(String.format("%s/%s/?person=mainPerson", URL, enrollmentId.toString()))
                                   .content(JsonOutput.toJson(personToUpdate))
                                   .requestAttr("username", "test@gmail.com")
                                   .contentType(APPLICATION_JSON))
         then:
-            1 * promService.update(personToUpdate, enrollmentId, "mainPerson", "test@gmail.com") >>
+            1 * promService.updateEnrollment(personToUpdate, enrollmentId, "mainPerson", "test@gmail.com") >>
                 {throw new PromEnrollmentDoesNotExist("Prom enrollment with this Id does not exist")}
         then:
             response.andExpect(status().isBadRequest())
@@ -482,12 +482,12 @@ class PromControllerTest extends Specification {
             PromEnrollmentPersonRequest personToUpdate = new PromEnrollmentPersonRequest("updatedName", "updatedSurname",
                 "updated@gmail.com", "345678901", true, 294242, "WIMiR", "IMiM", 3)
         when:
-            def response = mockMvc.perform(put(String.format("%s/%s/mainPerson", URL, secondEnrollmentId.toString()))
+            def response = mockMvc.perform(put(String.format("%s/%s/?person=mainPerson", URL, secondEnrollmentId.toString()))
                                   .content(JsonOutput.toJson(personToUpdate))
                                   .requestAttr("username", "test@gmail.com")
                                   .contentType(APPLICATION_JSON))
         then:
-            1 * promService.update(personToUpdate, secondEnrollmentId, "mainPerson", "test@gmail.com") >>
+            1 * promService.updateEnrollment(personToUpdate, secondEnrollmentId, "mainPerson", "test@gmail.com") >>
                 {throw new RecordBelongingException("This record belong to another user")}
         then:
             response.andExpect(status().isBadRequest())
@@ -501,7 +501,7 @@ class PromControllerTest extends Specification {
                                   .requestAttr("username", "test@gmail.com")
                                   .contentType(APPLICATION_JSON))
         then:
-            1 * promService.transfer(enrollmentId, "new@gmail.com", "test@gmail.com")
+            1 * promService.transferEnrollment(enrollmentId, "new@gmail.com", "test@gmail.com")
         then:
             response.andExpect(status().isOk())
             response.andExpect(jsonPath('$.action').value("Enrollment successfully transferred to new@gmail.com"))
@@ -513,7 +513,7 @@ class PromControllerTest extends Specification {
                                   .requestAttr("username", "test@gmail.com")
                                   .contentType(APPLICATION_JSON))
         then:
-            1 * promService.transfer(enrollmentId, "new@gmail.com", "test@gmail.com") >>
+            1 * promService.transferEnrollment(enrollmentId, "new@gmail.com", "test@gmail.com") >>
                     {throw new UserDoesNotExistException("User to whom you try to transfer enrollment does not exist")}
         then:
             response.andExpect(status().isBadRequest())
@@ -527,7 +527,7 @@ class PromControllerTest extends Specification {
                                   .requestAttr("username", "test@gmail.com")
                                   .contentType(APPLICATION_JSON))
         then:
-            1 * promService.transfer(enrollmentId, "new@gmail.com", "test@gmail.com") >>
+            1 * promService.transferEnrollment(enrollmentId, "new@gmail.com", "test@gmail.com") >>
                 {throw new PromEnrollmentDoesNotExist("Prom enrollment with this Id does not exist")}
         then:
             response.andExpect(status().isBadRequest())
@@ -541,7 +541,7 @@ class PromControllerTest extends Specification {
                                   .requestAttr("username", "test@gmail.com")
                                   .contentType(APPLICATION_JSON))
         then:
-            1 * promService.transfer(enrollmentId, "new@gmail.com", "test@gmail.com") >>
+            1 * promService.transferEnrollment(enrollmentId, "new@gmail.com", "test@gmail.com") >>
                 {throw new RecordBelongingException("This record belong to another user")}
         then:
         response.andExpect(status().isBadRequest())

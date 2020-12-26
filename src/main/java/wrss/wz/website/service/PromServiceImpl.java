@@ -6,23 +6,18 @@ import org.springframework.stereotype.Service;
 import wrss.wz.website.entity.PromEnrollmentEntity;
 import wrss.wz.website.entity.PromPersonEntity;
 import wrss.wz.website.entity.StudentEntity;
-import wrss.wz.website.exception.custom.PromEnrollmentDoesNotExist;
-import wrss.wz.website.exception.custom.PromPersonEntityNotExistException;
-import wrss.wz.website.exception.custom.RecordBelongingException;
 import wrss.wz.website.exception.custom.UserDoesNotExistException;
 import wrss.wz.website.model.request.PromEnrollmentPersonRequest;
 import wrss.wz.website.model.request.PromEnrollmentRequest;
 import wrss.wz.website.model.response.PromEnrollmentPersonResponse;
 import wrss.wz.website.model.response.PromEnrollmentResponse;
-import wrss.wz.website.repository.PromEnrollmentRepository;
-import wrss.wz.website.repository.PromPersonRepository;
 import wrss.wz.website.repository.UserRepository;
 import wrss.wz.website.service.interfaces.PromService;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,34 +25,31 @@ public class PromServiceImpl implements PromService {
 
     private final ModelMapper modelMapper;
     private final UserRepository userRepository;
-    private final PromPersonRepository promPersonRepository;
-    private final PromEnrollmentRepository promEnrollmentRepository;
+
+    private final PromUtils promUtils;
 
     @Override
     @Transactional
-    public List<PromEnrollmentResponse> getAll(String username) {
+    public List<PromEnrollmentResponse> getOwnEnrollments(String username) {
 
         StudentEntity user = userRepository.findByUsername(username);
-        List<PromEnrollmentEntity> allPersonEnrollments = promEnrollmentRepository.findAllByUser(user);
 
-        List<PromEnrollmentResponse> response = new ArrayList<>();
-        allPersonEnrollments.forEach(enrollment -> response.add(modelMapper.map(enrollment, PromEnrollmentResponse.class)));
-
-        return response;
+        return promUtils.getRepository().findAllByUser(user)
+                                        .stream()
+                                        .map(enrollment -> modelMapper.map(enrollment, PromEnrollmentResponse.class))
+                                        .collect(Collectors.toList());
     }
 
     @Override
     @Transactional
-    public PromEnrollmentResponse get(UUID enrollmentId, String username) {
+    public PromEnrollmentResponse getEnrollment(UUID enrollmentId, String username) {
 
-        StudentEntity user = userRepository.findByUsername(username);
-        PromEnrollmentEntity promEnrollmentEntity = getPromEnrollmentEntity(enrollmentId, user);
-        return modelMapper.map(promEnrollmentEntity, PromEnrollmentResponse.class);
+        return promUtils.getEnrollment(enrollmentId, username, false);
     }
 
     @Override
     @Transactional
-    public PromEnrollmentResponse signUp(PromEnrollmentRequest promEnrollmentRequest, String username) {
+    public PromEnrollmentResponse createEnrollment(PromEnrollmentRequest promEnrollmentRequest, String username) {
 
         StudentEntity user = userRepository.findByUsername(username);
         PromPersonEntity mainPerson = modelMapper.map(promEnrollmentRequest.getMainPerson(), PromPersonEntity.class);
@@ -68,38 +60,30 @@ public class PromServiceImpl implements PromService {
                                                               .message(promEnrollmentRequest.getMessage())
                                                               .paid(false)
                                                               .build();
+
         if (promEnrollmentRequest.getType().equals("pair")) {
             PromPersonEntity partner = modelMapper.map(promEnrollmentRequest.getPartner(), PromPersonEntity.class);
             enrollment.setPartner(partner);
         }
 
-        PromEnrollmentEntity save = promEnrollmentRepository.save(enrollment);
+        PromEnrollmentEntity save = promUtils.getRepository().save(enrollment);
+
         return modelMapper.map(save, PromEnrollmentResponse.class);
     }
 
     @Override
     @Transactional
-    public PromEnrollmentPersonResponse update(PromEnrollmentPersonRequest promEnrollmentPersonRequest, UUID enrollmentId,
-                                               String person, String username) {
+    public PromEnrollmentPersonResponse updateEnrollment(PromEnrollmentPersonRequest promEnrollmentPersonRequest, UUID enrollmentId,
+                                                         String person, String username) {
 
-        StudentEntity user = userRepository.findByUsername(username);
-        PromEnrollmentEntity promEnrollmentEntity = getPromEnrollmentEntity(enrollmentId, user);
-
-        PromPersonEntity promPersonEntityToUpdate = getPromPersonEntity(promEnrollmentEntity, person);
-
-        PromPersonEntity promPersonEntityUpdated = modelMapper.map(promEnrollmentPersonRequest, PromPersonEntity.class);
-        promPersonEntityUpdated.setPromPersonId(promPersonEntityToUpdate.getPromPersonId());
-
-        PromPersonEntity updated =  promPersonRepository.save(promPersonEntityUpdated);
-        return modelMapper.map(updated, PromEnrollmentPersonResponse.class);
+        return promUtils.updateEnrollment(promEnrollmentPersonRequest, enrollmentId, person, username, false);
     }
 
     @Override
     @Transactional
-    public void transfer(UUID enrollmentId, String newUsername, String username) {
+    public void transferEnrollment(UUID enrollmentId, String newUsername, String username) {
 
-        StudentEntity user = userRepository.findByUsername(username);
-        PromEnrollmentEntity promEnrollmentEntity = getPromEnrollmentEntity(enrollmentId, user);
+        PromEnrollmentEntity promEnrollmentEntity = promUtils.getPromEnrollmentEntity(enrollmentId, username, false);
 
         StudentEntity newUser = userRepository.findByUsername(newUsername);
 
@@ -108,39 +92,7 @@ public class PromServiceImpl implements PromService {
         }
 
         promEnrollmentEntity.setUser(newUser);
-        promEnrollmentRepository.save(promEnrollmentEntity);
-    }
 
-    private PromEnrollmentEntity getPromEnrollmentEntity(UUID enrollmentId, StudentEntity user) {
-
-        PromEnrollmentEntity promEnrollmentEntity = promEnrollmentRepository.findByPromEnrollmentId(enrollmentId);
-
-        if (promEnrollmentEntity == null) {
-            throw new PromEnrollmentDoesNotExist("Prom enrollment with this Id does not exist");
-        }
-
-        if (!user.getUsername().equals(promEnrollmentEntity.getUser().getUsername())) {
-            throw new RecordBelongingException("This record belong to another user");
-        }
-
-        return promEnrollmentEntity;
-    }
-
-    private PromPersonEntity getPromPersonEntity(PromEnrollmentEntity promEnrollmentEntity, String person) {
-
-        PromPersonEntity promPersonEntity = null;
-
-        if (person.equals("mainPerson")) {
-            promPersonEntity = promEnrollmentEntity.getMainPerson();
-
-        } else if (person.equals("partner")) {
-            promPersonEntity = promEnrollmentEntity.getPartner();
-        }
-
-        if (promPersonEntity == null) {
-            throw new PromPersonEntityNotExistException("Person to update does not exist");
-        }
-
-        return promPersonEntity;
+        promUtils.getRepository().save(promEnrollmentEntity);
     }
 }
