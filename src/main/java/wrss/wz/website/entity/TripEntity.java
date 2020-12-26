@@ -24,6 +24,8 @@ import java.util.UUID;
 @NoArgsConstructor
 public class TripEntity {
 
+    //TODO: Class to refactor, not used in 1.0 version but needed in feature version
+
     @Id
     @NotNull
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -39,7 +41,6 @@ public class TripEntity {
     @NotBlank
     private String email;
 
-    //TODO: Add custom validation for index
     @NotBlank
     private Integer index;
 
@@ -56,5 +57,4 @@ public class TripEntity {
             cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
     @JoinColumn(name = "user_id")
     private StudentEntity user;
-
 }

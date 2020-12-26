@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface PromService {
+
     List<PromEnrollmentResponse> getOwnEnrollments(String username);
     PromEnrollmentResponse getEnrollment(UUID enrollmentId, String username);
     PromEnrollmentResponse createEnrollment(PromEnrollmentRequest promEnrollmentRequest, String username);

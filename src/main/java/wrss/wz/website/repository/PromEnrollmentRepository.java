@@ -10,6 +10,7 @@ import java.util.UUID;
 
 @Repository
 public interface PromEnrollmentRepository extends JpaRepository<PromEnrollmentEntity, Long> {
+
     List<PromEnrollmentEntity> findAllByUser(StudentEntity user);
     PromEnrollmentEntity findByPromEnrollmentId(UUID enrollmentId);
 }

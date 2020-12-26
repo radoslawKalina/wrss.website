@@ -93,7 +93,7 @@ class UserControllerTest extends Specification {
     }
 
     @Unroll
-    def "should return 400 and custom exception when request is not valid"() {
+    def "should return 400 and custom exception when create user request is not valid"() {
         given:
             Map request = [
                     name: name,

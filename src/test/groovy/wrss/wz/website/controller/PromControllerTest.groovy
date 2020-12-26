@@ -26,19 +26,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 class PromControllerTest extends Specification {
 
-    String URL = "/api/student/prom"
+    String BASE_URL = "/api/student/prom"
+    String URL_WITH_ID = "/api/student/prom/{enrollmentId}"
 
     UUID enrollmentId = UUID.randomUUID()
     UUID secondEnrollmentId = UUID.randomUUID()
-
-    PromEnrollmentPersonRequest mainPerson = new PromEnrollmentPersonRequest("firstName", "firstSurname",
-            "first@gmail.com", "123456789", true, 284242, "WZ", "IiE", 2)
-
-    PromEnrollmentPersonRequest partner = new PromEnrollmentPersonRequest("secondName", "secondSurname",
-            "second@gmail.com", "234567890", false, null, null, null, null)
-
-    PromEnrollmentRequest pairRequest = new PromEnrollmentRequest("pair", mainPerson, partner, "message")
-    PromEnrollmentRequest singleRequest = new PromEnrollmentRequest("single", mainPerson, null, "message")
 
     PromEnrollmentPersonResponse mainPersonResponse = new PromEnrollmentPersonResponse("firstName", "firstSurname",
             "first@gmail.com", "123456789", true, 284242, "WZ", "IiE", 2)
@@ -67,7 +59,7 @@ class PromControllerTest extends Specification {
 
     def "should return all enrollments which belongs to user"() {
         when:
-            def response = mockMvc.perform(get(URL)
+            def response = mockMvc.perform(get(BASE_URL)
                                   .requestAttr("username", "test@gmail.com")
                                   .contentType(APPLICATION_JSON))
         then:
@@ -89,7 +81,7 @@ class PromControllerTest extends Specification {
 
     def "should return empty list when get prom enrollments but user do not have any"() {
         when:
-            def response = mockMvc.perform(get(URL)
+            def response = mockMvc.perform(get(BASE_URL)
                                   .requestAttr("username", "test@gmail.com")
                                   .contentType(APPLICATION_JSON))
         then:
@@ -101,7 +93,7 @@ class PromControllerTest extends Specification {
 
     def "should return enrollment when it belongs to user"() {
         when:
-            def response = mockMvc.perform(get(String.format("%s/%s", URL, enrollmentId.toString()))
+            def response = mockMvc.perform(get(URL_WITH_ID, enrollmentId.toString())
                                   .requestAttr("username", "test@gmail.com")
                                   .contentType(APPLICATION_JSON))
         then:
@@ -117,7 +109,7 @@ class PromControllerTest extends Specification {
 
     def "should return error response when user try to get enrollment which does not exist"() {
         when:
-        def response = mockMvc.perform(get(String.format("%s/%s", URL, enrollmentId.toString()))
+        def response = mockMvc.perform(get(URL_WITH_ID, enrollmentId.toString())
                               .requestAttr("username", "test@gmail.com")
                               .contentType(APPLICATION_JSON))
         then:
@@ -131,7 +123,7 @@ class PromControllerTest extends Specification {
 
     def "should return error response when user try to get enrollment which not belong to him"() {
         when:
-            def response = mockMvc.perform(get(String.format("%s/%s", URL, enrollmentId.toString()))
+            def response = mockMvc.perform(get(URL_WITH_ID, enrollmentId.toString())
                                   .requestAttr("username", "test@gmail.com")
                                   .contentType(APPLICATION_JSON))
         then:
@@ -144,8 +136,14 @@ class PromControllerTest extends Specification {
     }
 
     def "should create prom enrollment pair type and return with 200"() {
+        given:
+            PromEnrollmentPersonRequest mainPerson = new PromEnrollmentPersonRequest("firstName", "firstSurname",
+                "first@gmail.com", "123456789", true, 284242, "WZ", "IiE", 2)
+            PromEnrollmentPersonRequest partner = new PromEnrollmentPersonRequest("secondName", "secondSurname",
+                "second@gmail.com", "234567890", false, null, null, null, null)
+            PromEnrollmentRequest pairRequest = new PromEnrollmentRequest("pair", mainPerson, partner, "message")
         when:
-            def response = mockMvc.perform(post(URL)
+            def response = mockMvc.perform(post(BASE_URL)
                                   .content(JsonOutput.toJson(pairRequest))
                                   .requestAttr("username", "test@gmail.com")
                                   .contentType(APPLICATION_JSON))
@@ -159,8 +157,12 @@ class PromControllerTest extends Specification {
     }
 
     def "should create prom enrollment single type and return with 200"() {
+        given:
+            PromEnrollmentPersonRequest mainPerson = new PromEnrollmentPersonRequest("firstName", "firstSurname",
+                "first@gmail.com", "123456789", true, 284242, "WZ", "IiE", 2)
+            PromEnrollmentRequest singleRequest = new PromEnrollmentRequest("single", mainPerson, null, "message")
         when:
-            def response = mockMvc.perform(post(URL)
+            def response = mockMvc.perform(post(BASE_URL)
                                   .content(JsonOutput.toJson(singleRequest))
                                   .requestAttr("username", "test@gmail.com")
                                   .contentType(APPLICATION_JSON))
@@ -173,7 +175,7 @@ class PromControllerTest extends Specification {
             response.andExpect(jsonPath('$.message').value("message"))
     }
 
-    def "should return 400 and custom exception when mainPerson is null during sign up pair type"() {
+    def "should return 400 and custom exception when mainPerson is null during creating prom pair type enrollment"() {
         given:
             Map partner = [
                 name: pName,
@@ -193,7 +195,7 @@ class PromControllerTest extends Specification {
                 message: "message"
             ]
         when:
-            def response = mockMvc.perform(post(URL)
+            def response = mockMvc.perform(post(BASE_URL)
                                   .content(JsonOutput.toJson(request))
                                   .contentType(APPLICATION_JSON))
         then:
@@ -205,7 +207,7 @@ class PromControllerTest extends Specification {
             "partnerName" | "partnerSurname" | "second@gmail.com" | "234567890"  | true     | "284255" | "WZ"     | "ZiIP" | 5
     }
 
-    def "should return 400 and custom exception when mainPerson is null during sign up single type"() {
+    def "should return 400 and custom exception when mainPerson is null during creating prom single type enrollment"() {
         given:
             Map request = [
                 type: "single",
@@ -214,7 +216,7 @@ class PromControllerTest extends Specification {
                 message: "message"
             ]
         when:
-            def response = mockMvc.perform(post(URL)
+            def response = mockMvc.perform(post(BASE_URL)
                                   .content(JsonOutput.toJson(request))
                                   .contentType(APPLICATION_JSON))
         then:
@@ -224,7 +226,7 @@ class PromControllerTest extends Specification {
     }
 
     @Unroll
-    def "should return 400 and custom exception when request is not valid during sign up"() {
+    def "should return 400 and custom exception when request is not valid during creating enrollment"() {
         given:
             Map mainPerson = [
                     name: name,
@@ -255,7 +257,7 @@ class PromControllerTest extends Specification {
                     message: message
             ]
         when:
-            def response = mockMvc.perform(post(URL)
+            def response = mockMvc.perform(post(BASE_URL)
                                   .content(JsonOutput.toJson(request))
                                   .contentType(APPLICATION_JSON))
         then:
@@ -383,14 +385,14 @@ class PromControllerTest extends Specification {
             "pair"        | "message"        | "partner.phoneNumber: Wrong value for phone number field. You need to provide valid phone number"
     }
 
-    def "should update mainPerson data and response with 200"() {
+    def "should update mainPerson data and return 200"() {
         given:
             PromEnrollmentPersonRequest personToUpdate = new PromEnrollmentPersonRequest("updatedName", "updatedSurname",
                 "updated@gmail.com", "345678901", true, 294242, "WIMiR", "IMiM", 3)
             PromEnrollmentPersonResponse updatedPerson = new PromEnrollmentPersonResponse("updatedName", "updatedSurname",
                 "updated@gmail.com", "345678901", true, 294242, "WIMiR", "IMiM", 3)
         when:
-            def response = mockMvc.perform(put(String.format("%s/%s/?person=mainPerson", URL, enrollmentId.toString()))
+            def response = mockMvc.perform(put(String.format(URL_WITH_ID + "?person=mainPerson"), enrollmentId.toString())
                                   .content(JsonOutput.toJson(personToUpdate))
                                   .requestAttr("username", "test@gmail.com")
                                   .contentType(APPLICATION_JSON))
@@ -405,7 +407,7 @@ class PromControllerTest extends Specification {
     }
 
     @Unroll
-    def "should respond with 400 and custom error message when request is not valid when update"() {
+    def "should return 400 and custom error message when request is not valid when update enrollment"() {
         given:
             Map person = [
                 name: name,
@@ -419,7 +421,7 @@ class PromControllerTest extends Specification {
                 year: null
             ]
         when:
-            def response = mockMvc.perform(put(String.format("%s/%s/?person=mainPerson", URL, enrollmentId.toString()))
+            def response = mockMvc.perform(put(String.format(URL_WITH_ID + "?person=mainPerson"), enrollmentId.toString())
                                   .content(JsonOutput.toJson(person))
                                   .requestAttr("username", "test@gmail.com")
                                   .contentType(APPLICATION_JSON))
@@ -446,7 +448,7 @@ class PromControllerTest extends Specification {
             PromEnrollmentPersonRequest personToUpdate = new PromEnrollmentPersonRequest("updatedName", "updatedSurname",
                 "updated@gmail.com", "345678901", true, 294242, "WIMiR", "IMiM", 3)
         when:
-            def response = mockMvc.perform(put(String.format("%s/%s/?person=wrongValue", URL, enrollmentId.toString()))
+            def response = mockMvc.perform(put(String.format(URL_WITH_ID + "?person=wrongValue"), enrollmentId.toString())
                                   .content(JsonOutput.toJson(personToUpdate))
                                   .requestAttr("username", "test@gmail.com")
                                   .contentType(APPLICATION_JSON))
@@ -464,7 +466,7 @@ class PromControllerTest extends Specification {
             PromEnrollmentPersonRequest personToUpdate = new PromEnrollmentPersonRequest("updatedName", "updatedSurname",
                 "updated@gmail.com", "345678901", true, 294242, "WIMiR", "IMiM", 3)
         when:
-            def response = mockMvc.perform(put(String.format("%s/%s/?person=mainPerson", URL, enrollmentId.toString()))
+            def response = mockMvc.perform(put(String.format(URL_WITH_ID + "?person=mainPerson"), enrollmentId.toString())
                                   .content(JsonOutput.toJson(personToUpdate))
                                   .requestAttr("username", "test@gmail.com")
                                   .contentType(APPLICATION_JSON))
@@ -482,7 +484,7 @@ class PromControllerTest extends Specification {
             PromEnrollmentPersonRequest personToUpdate = new PromEnrollmentPersonRequest("updatedName", "updatedSurname",
                 "updated@gmail.com", "345678901", true, 294242, "WIMiR", "IMiM", 3)
         when:
-            def response = mockMvc.perform(put(String.format("%s/%s/?person=mainPerson", URL, secondEnrollmentId.toString()))
+            def response = mockMvc.perform(put(String.format(URL_WITH_ID + "?person=mainPerson"), secondEnrollmentId.toString())
                                   .content(JsonOutput.toJson(personToUpdate))
                                   .requestAttr("username", "test@gmail.com")
                                   .contentType(APPLICATION_JSON))
@@ -497,7 +499,7 @@ class PromControllerTest extends Specification {
 
     def "should transfer enrollment to another person"() {
         when:
-            def response = mockMvc.perform(put(String.format("%s/%s/transfer/?newUsername=%s", URL, enrollmentId.toString(), "new@gmail.com"))
+            def response = mockMvc.perform(put(String.format(URL_WITH_ID + "/transfer?newUsername=%s", "new@gmail.com"), enrollmentId.toString())
                                   .requestAttr("username", "test@gmail.com")
                                   .contentType(APPLICATION_JSON))
         then:
@@ -509,7 +511,7 @@ class PromControllerTest extends Specification {
 
     def "should return with 400 and custom exception when user to whom enrollment transfer targeting does not exist"() {
         when:
-            def response = mockMvc.perform(put(String.format("%s/%s/transfer/?newUsername=%s", URL, enrollmentId.toString(), "new@gmail.com"))
+            def response = mockMvc.perform(put(String.format(URL_WITH_ID + "/transfer?newUsername=%s", "new@gmail.com"), enrollmentId.toString())
                                   .requestAttr("username", "test@gmail.com")
                                   .contentType(APPLICATION_JSON))
         then:
@@ -523,7 +525,7 @@ class PromControllerTest extends Specification {
 
     def "should return with 400 and custom exception when user try to transfer enrollment which does not exist"() {
         when:
-            def response = mockMvc.perform(put(String.format("%s/%s/transfer/?newUsername=%s", URL, enrollmentId.toString(), "new@gmail.com"))
+            def response = mockMvc.perform(put(String.format(URL_WITH_ID + "/transfer?newUsername=%s", "new@gmail.com"), enrollmentId.toString())
                                   .requestAttr("username", "test@gmail.com")
                                   .contentType(APPLICATION_JSON))
         then:
@@ -537,7 +539,7 @@ class PromControllerTest extends Specification {
 
     def "should return with 400 and custom exception when user try to transfer enrollment which does not belong to him"() {
         when:
-            def response = mockMvc.perform(put(String.format("%s/%s/transfer/?newUsername=%s", URL, enrollmentId.toString(), "new@gmail.com"))
+            def response = mockMvc.perform(put(String.format(URL_WITH_ID + "/transfer?newUsername=%s", "new@gmail.com"), enrollmentId.toString())
                                   .requestAttr("username", "test@gmail.com")
                                   .contentType(APPLICATION_JSON))
         then:

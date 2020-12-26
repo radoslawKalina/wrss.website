@@ -12,6 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ErrorResponse {
+
     private ErrorType errorType;
     private List<String> errorMessage;
 }

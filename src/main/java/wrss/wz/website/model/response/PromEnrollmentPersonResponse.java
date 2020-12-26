@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PromEnrollmentPersonResponse {
+
     private String name;
     private String surname;
     private String email;

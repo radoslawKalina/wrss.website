@@ -6,6 +6,7 @@ import wrss.wz.website.entity.RoleEntity;
 
 @Repository
 public interface RoleRepository extends JpaRepository<RoleEntity, Long> {
-    //TODO: Check what is different between JpaRepository and CRUDRepository
+
+    //TODO: Check what are differences between JpaRepository and CRUDRepository
     RoleEntity findByRole(String role);
 }

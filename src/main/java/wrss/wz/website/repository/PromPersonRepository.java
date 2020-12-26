@@ -8,5 +8,6 @@ import java.util.UUID;
 
 @Repository
 public interface PromPersonRepository extends JpaRepository<PromPersonEntity, Long> {
+
     PromPersonEntity findByPromPersonId(UUID promPersonId);
 }

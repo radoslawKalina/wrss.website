@@ -19,9 +19,6 @@ import wrss.wz.website.repository.UserRepository
 
 class PromServiceTest extends Specification {
 
-    private StudentEntity user = new StudentEntity(UUID.randomUUID(), "First", "test@gmail.com",
-            "password", new ArrayList<RoleEntity>(), new ArrayList<TripEntity>(), new ArrayList<PromEnrollmentEntity>())
-
     private StudentEntity secondUser = new StudentEntity(UUID.randomUUID(), "Second", "second.test@gmail.com",
             "password", new ArrayList<RoleEntity>(), new ArrayList<TripEntity>(), new ArrayList<PromEnrollmentEntity>())
 
@@ -110,6 +107,8 @@ class PromServiceTest extends Specification {
 
     def "should throw PromPersonEntityNotExistException when user try to update partner data which was null"() {
         given:
+            StudentEntity user = new StudentEntity(UUID.randomUUID(), "First", "test@gmail.com",
+                "password", new ArrayList<RoleEntity>(), new ArrayList<TripEntity>(), new ArrayList<PromEnrollmentEntity>())
             PromEnrollmentEntity singleEnrollment = new PromEnrollmentEntity(UUID.randomUUID(), firstPerson, null,
                 user, false, "message")
         when:

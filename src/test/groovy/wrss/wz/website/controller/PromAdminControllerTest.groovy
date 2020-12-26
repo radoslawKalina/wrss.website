@@ -29,15 +29,6 @@ class PromAdminControllerTest extends Specification {
     UUID enrollmentId = UUID.randomUUID()
     UUID secondEnrollmentId = UUID.randomUUID()
 
-    PromEnrollmentPersonRequest mainPerson = new PromEnrollmentPersonRequest("firstName", "firstSurname",
-            "first@gmail.com", "123456789", true, 284242, "WZ", "IiE", 2)
-
-    PromEnrollmentPersonRequest partner = new PromEnrollmentPersonRequest("secondName", "secondSurname",
-            "second@gmail.com", "234567890", false, null, null, null, null)
-
-    PromEnrollmentRequest pairRequest = new PromEnrollmentRequest("pair", mainPerson, partner, "message")
-    PromEnrollmentRequest singleRequest = new PromEnrollmentRequest("single", mainPerson, null, "message")
-
     PromEnrollmentPersonResponse mainPersonResponse = new PromEnrollmentPersonResponse("firstName", "firstSurname",
             "first@gmail.com", "123456789", true, 284242, "WZ", "IiE", 2)
 

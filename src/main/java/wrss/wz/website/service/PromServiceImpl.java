@@ -16,6 +16,7 @@ import wrss.wz.website.service.interfaces.PromService;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -25,7 +26,6 @@ public class PromServiceImpl implements PromService {
 
     private final ModelMapper modelMapper;
     private final UserRepository userRepository;
-
     private final PromBase promBase;
 
     @Override
@@ -35,9 +35,9 @@ public class PromServiceImpl implements PromService {
         StudentEntity user = userRepository.findByUsername(username);
 
         return promBase.getRepository().findAllByUser(user)
-                                        .stream()
-                                        .map(enrollment -> modelMapper.map(enrollment, PromEnrollmentResponse.class))
-                                        .collect(Collectors.toList());
+                                       .stream()
+                                       .map(enrollment -> modelMapper.map(enrollment, PromEnrollmentResponse.class))
+                                       .collect(Collectors.toList());
     }
 
     @Override
@@ -85,14 +85,11 @@ public class PromServiceImpl implements PromService {
 
         PromEnrollmentEntity promEnrollmentEntity = promBase.getPromEnrollmentEntity(enrollmentId, username, false);
 
-        StudentEntity newUser = userRepository.findByUsername(newUsername);
-
-        if (newUser == null) {
-            throw new UserDoesNotExistException("User to whom you try to transfer enrollment does not exist");
-        }
+        String errorMessage = "User to whom you try to transfer enrollment does not exist";
+        StudentEntity newUser = Optional.ofNullable(userRepository.findByUsername(newUsername))
+                                        .orElseThrow(() -> new UserDoesNotExistException(errorMessage));
 
         promEnrollmentEntity.setUser(newUser);
-
         promBase.getRepository().save(promEnrollmentEntity);
     }
 }

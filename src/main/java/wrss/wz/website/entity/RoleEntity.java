@@ -28,5 +28,4 @@ public class RoleEntity {
 
     @ManyToMany(mappedBy = "roles")
     private List<StudentEntity> students;
-
 }

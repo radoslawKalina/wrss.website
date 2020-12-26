@@ -31,8 +31,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
             .addFilter(new JWTAuthenticationFilter(authenticationManager()))
             .addFilterAfter(new JWTAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class)
             .authorizeRequests()
-            .antMatchers("/api/student/trip/**").hasAuthority("STUDENT")
-            .antMatchers("/api/admin/trip/**").hasAuthority("ADMIN")
             .antMatchers("/api/student/prom/**").hasAuthority("STUDENT")
             .antMatchers("/api/admin/prom/**").hasAuthority("ADMIN")
             .antMatchers("/").permitAll()

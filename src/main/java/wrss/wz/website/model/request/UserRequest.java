@@ -21,5 +21,4 @@ public class UserRequest {
 
     @NotBlank(message = "Password field can't be blank")
     private String password;
-
 }

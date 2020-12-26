@@ -1,4 +1,4 @@
-package wrss.wz.website.config;
+package wrss.wz.website.interceptor;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.servlet.HandlerInterceptor;
