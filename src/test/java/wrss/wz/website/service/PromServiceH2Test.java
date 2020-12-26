@@ -100,7 +100,7 @@ public class PromServiceH2Test {
         assertThat(response.getPromEnrollmentId()).isEqualTo(enrollmentId);
         assertThat(response.getMainPerson()).isEqualTo(mainPerson);
         assertThat(response.getPartner()).isNull();
-        assertThat(response.isPaid()).isFalse();
+        assertThat(response.isPaid()).isTrue();
         assertThat(response.getMessage()).isEqualTo("thirdMessage");
     }
 

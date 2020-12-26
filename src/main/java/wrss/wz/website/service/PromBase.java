@@ -19,7 +19,7 @@ import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
-public class PromUtils {
+public class PromBase {
 
     private final ModelMapper modelMapper;
     private final PromPersonRepository promPersonRepository;

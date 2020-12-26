@@ -42,7 +42,7 @@ class PromServiceTest extends Specification {
     private PromEnrollmentRepository promEnrollmentRepository
 
     private ModelMapper modelMapper
-    private PromUtils promUtils
+    private PromBase promUtils
 
     def setup() {
         userRepository = Mock()
@@ -50,7 +50,7 @@ class PromServiceTest extends Specification {
         promEnrollmentRepository = Mock()
 
         modelMapper = new ModelMapper()
-        promUtils = new PromUtils(modelMapper, promPersonRepository, promEnrollmentRepository)
+        promUtils = new PromBase(modelMapper, promPersonRepository, promEnrollmentRepository)
 
         promServiceImpl = new PromServiceImpl(modelMapper, userRepository, promUtils)
     }

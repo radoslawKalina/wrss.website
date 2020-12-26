@@ -22,12 +22,12 @@ public class PromAdminServiceImpl implements PromAdminService {
 
     private final ModelMapper modelMapper;
 
-    private final PromUtils promUtils;
+    private final PromBase promBase;
 
     @Override
     public List<PromEnrollmentResponse> getAllEnrollments() {
 
-        return promUtils.getRepository().findAll()
+        return promBase.getRepository().findAll()
                                         .stream()
                                         .map(enrollment -> modelMapper.map(enrollment, PromEnrollmentResponse.class))
                                         .collect(Collectors.toList());
@@ -36,30 +36,30 @@ public class PromAdminServiceImpl implements PromAdminService {
     @Override
     public PromEnrollmentResponse getEnrollment(UUID enrollmentId) {
 
-        return promUtils.getEnrollment(enrollmentId, ADMIN, true);
+        return promBase.getEnrollment(enrollmentId, ADMIN, true);
     }
 
     @Override
     public PromEnrollmentPersonResponse updateEnrollment(PromEnrollmentPersonRequest promEnrollmentPersonRequest,
                                                          UUID enrollmentId, String person) {
 
-        return promUtils.updateEnrollment(promEnrollmentPersonRequest, enrollmentId, person, ADMIN, true);
+        return promBase.updateEnrollment(promEnrollmentPersonRequest, enrollmentId, person, ADMIN, true);
     }
 
     @Override
     public void deleteEnrollment(UUID enrollmentId) {
 
-        PromEnrollmentEntity promEnrollmentEntity = promUtils.getPromEnrollmentEntity(enrollmentId, ADMIN, true);
-        promUtils.getRepository().delete(promEnrollmentEntity);
+        PromEnrollmentEntity promEnrollmentEntity = promBase.getPromEnrollmentEntity(enrollmentId, ADMIN, true);
+        promBase.getRepository().delete(promEnrollmentEntity);
     }
 
     @Override
     public PromEnrollmentResponse changeEnrollmentPaidStatus(UUID enrollmentId, PaidRequest paidRequest) {
 
-        PromEnrollmentEntity promEnrollmentEntity = promUtils.getPromEnrollmentEntity(enrollmentId, ADMIN, true);
+        PromEnrollmentEntity promEnrollmentEntity = promBase.getPromEnrollmentEntity(enrollmentId, ADMIN, true);
         promEnrollmentEntity.setPaid(paidRequest.isPaid());
 
-        PromEnrollmentEntity updatedPromEnrollmentEntity = promUtils.getRepository().save(promEnrollmentEntity);
+        PromEnrollmentEntity updatedPromEnrollmentEntity = promBase.getRepository().save(promEnrollmentEntity);
 
         return modelMapper.map(updatedPromEnrollmentEntity, PromEnrollmentResponse.class);
     }

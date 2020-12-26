@@ -26,7 +26,7 @@ public class PromServiceImpl implements PromService {
     private final ModelMapper modelMapper;
     private final UserRepository userRepository;
 
-    private final PromUtils promUtils;
+    private final PromBase promBase;
 
     @Override
     @Transactional
@@ -34,7 +34,7 @@ public class PromServiceImpl implements PromService {
 
         StudentEntity user = userRepository.findByUsername(username);
 
-        return promUtils.getRepository().findAllByUser(user)
+        return promBase.getRepository().findAllByUser(user)
                                         .stream()
                                         .map(enrollment -> modelMapper.map(enrollment, PromEnrollmentResponse.class))
                                         .collect(Collectors.toList());
@@ -44,7 +44,7 @@ public class PromServiceImpl implements PromService {
     @Transactional
     public PromEnrollmentResponse getEnrollment(UUID enrollmentId, String username) {
 
-        return promUtils.getEnrollment(enrollmentId, username, false);
+        return promBase.getEnrollment(enrollmentId, username, false);
     }
 
     @Override
@@ -66,7 +66,7 @@ public class PromServiceImpl implements PromService {
             enrollment.setPartner(partner);
         }
 
-        PromEnrollmentEntity save = promUtils.getRepository().save(enrollment);
+        PromEnrollmentEntity save = promBase.getRepository().save(enrollment);
 
         return modelMapper.map(save, PromEnrollmentResponse.class);
     }
@@ -76,14 +76,14 @@ public class PromServiceImpl implements PromService {
     public PromEnrollmentPersonResponse updateEnrollment(PromEnrollmentPersonRequest promEnrollmentPersonRequest, UUID enrollmentId,
                                                          String person, String username) {
 
-        return promUtils.updateEnrollment(promEnrollmentPersonRequest, enrollmentId, person, username, false);
+        return promBase.updateEnrollment(promEnrollmentPersonRequest, enrollmentId, person, username, false);
     }
 
     @Override
     @Transactional
     public void transferEnrollment(UUID enrollmentId, String newUsername, String username) {
 
-        PromEnrollmentEntity promEnrollmentEntity = promUtils.getPromEnrollmentEntity(enrollmentId, username, false);
+        PromEnrollmentEntity promEnrollmentEntity = promBase.getPromEnrollmentEntity(enrollmentId, username, false);
 
         StudentEntity newUser = userRepository.findByUsername(newUsername);
 
@@ -93,6 +93,6 @@ public class PromServiceImpl implements PromService {
 
         promEnrollmentEntity.setUser(newUser);
 
-        promUtils.getRepository().save(promEnrollmentEntity);
+        promBase.getRepository().save(promEnrollmentEntity);
     }
 }
