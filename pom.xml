@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>wrss.wz</groupId>
 	<artifactId>website</artifactId>
-	<version>0.0.2</version>
+	<version>0.0.3</version>
 	<name>website</name>
 	<description>WRSS WZ Website</description>
 
